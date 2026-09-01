@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A personal portfolio.">
+    <title>Portfolio</title>
+    <style>
+      :root {
+        color-scheme: light;
+        background: #FAF5F5;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+        margin: 0;
+        background: #FAF5F5;
+      }
+
+      body {
+        min-height: 100vh;
+        overflow: hidden;
+        background: #FAF5F5;
+        transition: background 500ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      body.dark {
+        background: #191817;
+      }
+
+      main {
+        position: relative;
+        min-height: 100vh;
+      }
+
+      .mood-toggle-wrapper {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      .mood-label {
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 1.84px;
+        text-transform: uppercase;
+        transition: color 500ms ease, opacity 500ms ease;
+      }
+
+      .mood-label--light {
+        color: #17160F;
+        opacity: 1;
+      }
+
+      .mood-label--dark {
+        color: #17160F;
+        opacity: 0.3;
+      }
+
+      body.dark .mood-label--light {
+        color: #FAF5F5;
+        opacity: 0.3;
+      }
+
+      body.dark .mood-label--dark {
+        color: #FAF5F5;
+        opacity: 1;
+      }
+
+      .mood-toggle {
+        position: relative;
+        width: 72px;
+        height: 36px;
+        padding: 0;
+        border: 0;
+        border-radius: 18px;
+        cursor: pointer;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.10), inset 0 0 0 1.5px rgba(23,22,15,0.06);
+        transition: box-shadow 400ms ease;
+      }
+
+      body.dark .mood-toggle {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 0 0 1.5px rgba(250,245,245,0.06);
+      }
+
+      .mood-toggle:focus-visible {
+        box-shadow: 0 0 0 3px rgba(23, 22, 15, 0.25);
+      }
+
+      .mood-toggle svg {
+        display: block;
+        width: 72px;
+        height: 36px;
+      }
+
+      /* GPU-accelerated layers for smoothness */
+      .sun-group,
+      .moon-group,
+      .stars-group,
+      .clouds-group,
+      .knob-group {
+        will-change: transform, opacity;
+      }
+
+      /* Sky — day is always the base, night overlays on top (no gap = no flash) */
+      .sky-night {
+        opacity: 0;
+        transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      body.dark .sky-night { opacity: 1; }
+
+      /* Sun — positioned right side, rises from behind hills */
+      .sun-group {
+        transform-origin: 48px 22px;
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        /* Sunrise: slow rise from behind the horizon */
+        transition:
+          transform 900ms cubic-bezier(0.16, 1, 0.3, 1) 100ms,
+          opacity 700ms cubic-bezier(0.22, 1, 0.36, 1) 50ms;
+      }
+      body.dark .sun-group {
+        opacity: 0;
+        transform: translateY(12px) scale(0.7);
+        /* Sunset: sinks behind the hills */
+        transition:
+          transform 500ms cubic-bezier(0.55, 0, 1, 0.45),
+          opacity 400ms ease;
+      }
+
+      /* Moon — descends softly into view when dark, floats up out when light */
+      .moon-group {
+        transform-origin: 18px 10px;
+        opacity: 0;
+        transform: translateY(-8px) scale(0.6);
+        /* Light-entering transition: moon exits upward */
+        transition:
+          transform 400ms cubic-bezier(0.55, 0, 1, 0.45),
+          opacity 300ms ease;
+      }
+      body.dark .moon-group {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        /* Dark-entering transition: moon drifts in from above */
+        transition:
+          transform 700ms cubic-bezier(0.16, 1, 0.3, 1) 200ms,
+          opacity 500ms cubic-bezier(0.22, 1, 0.36, 1) 180ms;
+      }
+
+      /* Stars — twinkle in after moon, fade out quickly */
+      .stars-group {
+        opacity: 0;
+        transition: opacity 250ms ease;
+      }
+      body.dark .stars-group {
+        opacity: 1;
+        transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1) 400ms;
+      }
+
+      /* Clouds — float in/out */
+      .clouds-group {
+        opacity: 0.55;
+        transform: translateX(0);
+        transition:
+          opacity 500ms cubic-bezier(0.22, 1, 0.36, 1) 200ms,
+          transform 600ms cubic-bezier(0.22, 1, 0.36, 1) 200ms;
+      }
+      body.dark .clouds-group {
+        opacity: 0;
+        transform: translateX(3px);
+        transition:
+          opacity 300ms ease,
+          transform 400ms ease;
+      }
+
+      /* Landscape color transitions */
+      .hills-back { transition: fill 700ms cubic-bezier(0.22, 1, 0.36, 1); fill: #8cb860; }
+      body.dark .hills-back { fill: #1e2e14; }
+      .hills-front { transition: fill 700ms cubic-bezier(0.22, 1, 0.36, 1); fill: #7aaa50; }
+      body.dark .hills-front { fill: #162410; }
+      .bush-back { transition: fill 700ms ease; fill: #6a9840; }
+      body.dark .bush-back { fill: #162410; }
+      .bush-front { transition: fill 700ms ease; fill: #5a8830; }
+      body.dark .bush-front { fill: #0e1a0a; }
+      .tree-trunk { transition: fill 700ms ease, stroke 700ms ease; fill: #8a6040; stroke: #8a6040; }
+      body.dark .tree-trunk { fill: #3a2818; stroke: #3a2818; }
+      .tree-leaves-a { transition: fill 700ms ease; fill: #5a9838; }
+      body.dark .tree-leaves-a { fill: #1a3010; }
+      .tree-leaves-b { transition: fill 700ms ease; fill: #4a8830; }
+      body.dark .tree-leaves-b { fill: #142810; }
+
+      /* Knob — spring bounce, GPU-composited */
+      .knob-group {
+        transform: translateX(0);
+        transition: transform 600ms cubic-bezier(0.34, 1.4, 0.64, 1);
+      }
+      body.dark .knob-group {
+        transform: translateX(36px);
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      /* ── Fixed Sidebar ── */
+      .sidebar {
+        position: fixed;
+        top: 72px;
+        left: clamp(24px, calc((100vw - 560px) / 2 - 306px), 72px);
+        z-index: 50;
+        display: flex;
+        align-items: flex-start;
+        gap: 22px;
+        user-select: none;
+        -webkit-user-select: none;
+        pointer-events: none;
+      }
+
+      .sidebar__dots {
+        width: 8px;
+        align-self: stretch;
+        flex-shrink: 0;
+        background-image: radial-gradient(circle at .8px .8px, #cbc9d6 .8px, transparent .9px);
+        background-size: 3.2px 3.6px;
+        transition: background-image 500ms ease;
+      }
+
+      body.dark .sidebar__dots {
+        background-image: radial-gradient(circle at .8px .8px, #39383f .8px, transparent .9px);
+      }
+
+      .sidebar__text {
+        display: flex;
+        flex-direction: column;
+        padding: 12px 0;
+      }
+
+      .sidebar__text span {
+        display: block;
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        font-weight: 500;
+        font-size: 12px;
+        line-height: 1.8;
+        letter-spacing: 1.84px;
+        text-transform: uppercase;
+        color: #9b9b9b;
+        transition: color 500ms ease;
+      }
+
+      .sidebar__text .sidebar__name {
+        font-weight: 600;
+        color: #060606;
+      }
+
+      body.dark .sidebar__text span {
+        color: #7d7c7c;
+      }
+
+      body.dark .sidebar__text .sidebar__name {
+        color: #f5f3f0;
+      }
+
+      @media (max-width: 40rem) {
+        .mood-toggle-wrapper {
+          top: 16px;
+          right: 16px;
+          gap: 10px;
+        }
+
+        .mood-label {
+          font-size: 10px;
+        }
+
+        .sidebar {
+          top: 16px;
+          left: 16px;
+        }
+
+        .sidebar__text span {
+          font-size: 11px;
+          letter-spacing: 1.5px;
+        }
+      }
+
+      /* ── V3 Seamless Bleed Video ── */
+      .video-frame {
+        position: absolute;
+        top: 28%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(200px, 50vw);
+        height: min(200px, 50vw);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .video-frame video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border-radius: 8px;
+        -webkit-mask-image: radial-gradient(
+          ellipse 68% 68% at 50% 50%,
+          black 40%,
+          transparent 100%
+        );
+        mask-image: radial-gradient(
+          ellipse 68% 68% at 50% 50%,
+          black 40%,
+          transparent 100%
+        );
+        transition: filter 700ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      body.dark .video-frame video {
+        filter: brightness(0.35) saturate(0.6);
+      }
+
+      /* Gradient overlays — fade edges into page background */
+      .video-frame::before,
+      .video-frame::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        border-radius: 8px;
+        transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      /* Light mode edge fade */
+      .video-frame::before {
+        background: radial-gradient(
+          ellipse 72% 72% at 50% 50%,
+          transparent 36%,
+          #FAF5F5 72%
+        );
+        opacity: 1;
+      }
+
+      body.dark .video-frame::before {
+        opacity: 0;
+      }
+
+      /* Dark mode edge fade */
+      .video-frame::after {
+        background: radial-gradient(
+          ellipse 72% 72% at 50% 50%,
+          transparent 36%,
+          #191817 72%
+        );
+        opacity: 0;
+      }
+
+      body.dark .video-frame::after {
+        opacity: 1;
+      }
+
+      /* ── Intro Section ── */
+      .intro {
+        position: absolute;
+        top: 52%;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        max-width: 560px;
+        width: min(100%, 560px);
+        padding: 0 24px;
+      }
+
+      .intro p {
+        margin: 0;
+      }
+
+      .intro__title {
+        font-family: 'Inter', system-ui, sans-serif;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 1.8;
+        letter-spacing: -0.12px;
+        color: #060606;
+        transition: color 500ms ease;
+      }
+
+      body.dark .intro__title {
+        color: #f5f3f0;
+      }
+
+      .intro__sub {
+        font-family: 'Inter', system-ui, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 1.6;
+        letter-spacing: -0.12px;
+        color: #434445;
+        opacity: 0.8;
+        transition: color 500ms ease;
+      }
+
+      body.dark .intro__sub {
+        color: #b9b8b6;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        body,
+        .sky-night,
+        .sun-group, .moon-group, .stars-group, .clouds-group,
+        .hills-back, .hills-front, .bush-back, .bush-front,
+        .tree-trunk, .tree-leaves-a, .tree-leaves-b,
+        .knob-group,
+        .mood-label,
+        .sidebar__text span,
+        .sidebar__dots,
+        .video-frame video,
+        .video-frame::before,
+        .video-frame::after {
+          transition: none !important;
+        }
+      }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <main>
+      <div class="sidebar">
+        <div class="sidebar__dots"></div>
+        <div class="sidebar__text">
+          <span class="sidebar__name">Juan Montreuil</span>
+          <span class="sidebar__detail">Lima, PE</span>
+          <span class="sidebar__detail">GMT-5</span>
+        </div>
+      </div>
+
+      <div class="mood-toggle-wrapper">
+        <span class="mood-label mood-label--light">Light</span>
+        <button class="mood-toggle" type="button" aria-label="Switch to dark mood" aria-pressed="false">
+          <svg viewBox="0 0 72 36" aria-hidden="true">
+            <defs>
+              <clipPath id="pill"><rect width="72" height="36" rx="18"/></clipPath>
+              <linearGradient id="day-sky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#b0cce8"/>
+                <stop offset="100%" stop-color="#d8e4f0"/>
+              </linearGradient>
+              <linearGradient id="night-sky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#0a0e1a"/>
+                <stop offset="100%" stop-color="#151828"/>
+              </linearGradient>
+              <radialGradient id="sun-glow" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0%" stop-color="#fff8d0" stop-opacity="0.7"/>
+                <stop offset="60%" stop-color="#ffeea0" stop-opacity="0.2"/>
+                <stop offset="100%" stop-color="#fff8d0" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="moon-glow" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0%" stop-color="#d8d8f0" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#d8d8f0" stop-opacity="0"/>
+              </radialGradient>
+              <!-- Crescent mask: white = visible, black = cut away -->
+              <mask id="crescent">
+                <circle cx="18" cy="11" r="5.5" fill="white"/>
+                <circle cx="20.5" cy="9.2" r="4.4" fill="black"/>
+              </mask>
+            </defs>
+
+            <g clip-path="url(#pill)">
+              <!-- Day sky (always visible as base — prevents flash on rapid toggle) -->
+              <rect width="72" height="36" fill="url(#day-sky)"/>
+              <!-- Night sky (overlays on top) -->
+              <rect class="sky-night" width="72" height="36" fill="url(#night-sky)"/>
+
+              <!-- Sun — right side, rises from behind hills near tree -->
+              <g class="sun-group">
+                <circle cx="48" cy="18" r="12" fill="url(#sun-glow)"/>
+                <circle cx="48" cy="18" r="6" fill="#ffe060" opacity="0.85"/>
+                <circle cx="48" cy="18" r="4.2" fill="#fff4a0"/>
+                <circle cx="48" cy="18" r="9" fill="none" stroke="#ffe880" stroke-width="0.4" opacity="0.25"/>
+              </g>
+
+              <!-- Moon — left side, true crescent via mask -->
+              <g class="moon-group">
+                <circle cx="18" cy="11" r="11" fill="url(#moon-glow)"/>
+                <circle cx="18" cy="11" r="5.5" fill="#e8e8f8" mask="url(#crescent)"/>
+              </g>
+
+              <!-- Stars -->
+              <g class="stars-group" fill="white">
+                <circle cx="30" cy="5.4" r="0.5" opacity="0.9"/>
+                <circle cx="39" cy="8.4" r="0.4" opacity="0.7"/>
+                <circle cx="46.5" cy="4.2" r="0.55" opacity="0.85"/>
+                <circle cx="54" cy="7.2" r="0.35" opacity="0.6"/>
+                <circle cx="12.6" cy="6" r="0.45" opacity="0.75"/>
+                <circle cx="25.5" cy="3.6" r="0.35" opacity="0.5"/>
+                <circle cx="34.5" cy="11.4" r="0.4" opacity="0.65"/>
+                <circle cx="60" cy="4.8" r="0.45" opacity="0.8"/>
+                <circle cx="51" cy="12" r="0.3" opacity="0.45"/>
+                <circle cx="42" cy="3" r="0.3" opacity="0.55"/>
+                <circle cx="16" cy="14" r="0.3" opacity="0.4"/>
+              </g>
+
+              <!-- Clouds -->
+              <g class="clouds-group" fill="white">
+                <circle cx="42" cy="9" r="2.4"/>
+                <circle cx="45" cy="8.4" r="1.8"/>
+                <circle cx="39.6" cy="9.6" r="1.5"/>
+                <circle cx="43.8" cy="10.2" r="1.5"/>
+                <circle cx="55.5" cy="6.6" r="1.8"/>
+                <circle cx="58.2" cy="6" r="1.5"/>
+                <circle cx="53.4" cy="7.2" r="1.2"/>
+              </g>
+
+              <!-- Back hills -->
+              <path class="hills-back" d="M0 23.4 Q9 18.6 21 21 Q33 23.4 45 19.8 Q57 16.2 72 19.2 L72 36 L0 36Z"/>
+              <ellipse class="bush-back" cx="9" cy="22.8" rx="3.6" ry="2.4"/>
+              <ellipse class="bush-back" cx="30" cy="21.6" rx="2.4" ry="1.5"/>
+              <ellipse class="bush-back" cx="48" cy="20.4" rx="3" ry="1.8"/>
+
+              <!-- Front hill -->
+              <path class="hills-front" d="M0 27.6 Q15 24.6 36 26.4 Q54 28.2 72 25.8 L72 36 L0 36Z"/>
+              <ellipse class="bush-front" cx="15" cy="27" rx="2.4" ry="1.5"/>
+              <ellipse class="bush-front" cx="54" cy="26.4" rx="1.8" ry="1.2"/>
+
+              <!-- Tree -->
+              <rect class="tree-trunk" x="58.5" y="15" width="1.5" height="8.4" rx="0.6" stroke="none"/>
+              <line class="tree-trunk" x1="59.1" y1="18" x2="56.4" y2="14.4" stroke-width="0.75" stroke-linecap="round" fill="none"/>
+              <line class="tree-trunk" x1="59.4" y1="16.8" x2="63" y2="13.2" stroke-width="0.75" stroke-linecap="round" fill="none"/>
+              <ellipse class="tree-leaves-a" cx="56.4" cy="13.2" rx="3.6" ry="3"/>
+              <ellipse class="tree-leaves-b" cx="61.2" cy="12" rx="4.2" ry="3.6"/>
+              <ellipse class="tree-leaves-a" cx="58.8" cy="10.8" rx="3" ry="2.7"/>
+
+              <!-- Knob — bigger (r=10), grouped for GPU transform -->
+              <g class="knob-group">
+                <circle cx="18" cy="18.6" r="10" fill="rgba(0,0,0,0.08)"/>
+                <circle cx="18" cy="18" r="10" fill="#FAF5F5"/>
+                <circle cx="18" cy="18" r="10" fill="none" stroke="rgba(23,22,15,0.05)" stroke-width="0.4"/>
+              </g>
+            </g>
+          </svg>
+          <span class="sr-only">Toggle between light and dark mood</span>
+        </button>
+        <span class="mood-label mood-label--dark">Dark</span>
+      </div>
+
+      <div class="video-frame">
+        <video src="assets/embroidery.mp4" autoplay loop muted playsinline></video>
+      </div>
+
+      <div class="intro">
+        <p class="intro__title">Data Engineer & Entrepreneur</p>
+        <p class="intro__sub">Building data infrastructure and analytics with an engineering mindset, obsessing over detail and eager to embrace what's next.</p>
+      </div>
+    </main>
+
+    <script>
+      const toggle = document.querySelector(".mood-toggle");
+      const switchSound = new Audio("assets/switch.m4a");
+      switchSound.preload = "auto";
+      switchSound.volume = 0.16;
+
+      let dark = false;
+
+      toggle.addEventListener("click", () => {
+        dark = !dark;
+        document.body.classList.toggle("dark", dark);
+        toggle.setAttribute("aria-pressed", String(dark));
+        toggle.setAttribute("aria-label", dark ? "Switch to light mood" : "Switch to dark mood");
+
+        try {
+          switchSound.currentTime = 0;
+          switchSound.play()?.catch(() => {});
+        } catch {}
+      });
+    </script>
+  </body>
+</html>

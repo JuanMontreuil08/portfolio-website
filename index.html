@@ -24,7 +24,6 @@
 
       body {
         min-height: 100vh;
-        overflow: hidden;
         background: #FAF5F5;
         transition: background 500ms cubic-bezier(0.22, 1, 0.36, 1);
       }
@@ -34,6 +33,9 @@
       }
 
       main {
+      }
+
+      .hero {
         position: relative;
         min-height: 100vh;
       }
@@ -426,6 +428,146 @@
         color: #b9b8b6;
       }
 
+      /* ── Projects Section ── */
+      .projects {
+        position: relative;
+        top: -30vh;
+        margin-bottom: -30vh;
+        padding: 0 80px 100px 140px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .projects__title {
+        font-family: 'Inter', system-ui, sans-serif;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 1.8;
+        letter-spacing: -0.12px;
+        color: #060606;
+        margin: 0 0 32px;
+        transition: color 500ms ease;
+      }
+
+      body.dark .projects__title {
+        color: #f5f3f0;
+      }
+
+      .projects__list {
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+      }
+
+      .project {
+        display: flex;
+        gap: 32px;
+        align-items: flex-start;
+      }
+
+      .project__video {
+        width: 220px;
+        height: 140px;
+        background: #e8e4de;
+        border-radius: 6px;
+        flex-shrink: 0;
+        overflow: hidden;
+        transition: background 500ms ease;
+      }
+
+      body.dark .project__video {
+        background: #2a2826;
+      }
+
+      .project__video video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .project__info {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-top: 2px;
+      }
+
+      .project__desc {
+        font-family: 'Inter', system-ui, sans-serif;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 1.6;
+        letter-spacing: -0.12px;
+        color: #434445;
+        opacity: 0.8;
+        margin: 0;
+        transition: color 500ms ease;
+      }
+
+      body.dark .project__desc {
+        color: #b9b8b6;
+      }
+
+      .project__stack-label {
+        font-family: 'Inter', system-ui, sans-serif;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 1.6;
+        letter-spacing: -0.12px;
+        color: #434445;
+        opacity: 0.8;
+        margin: 0;
+        transition: color 500ms ease;
+      }
+
+      body.dark .project__stack-label {
+        color: #b9b8b6;
+      }
+
+      .project__logos {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .project__logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: rgba(23, 22, 15, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 500ms ease;
+      }
+
+      body.dark .project__logo {
+        background: rgba(250, 245, 245, 0.08);
+      }
+
+      .project__logo img {
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+      }
+
+      @media (max-width: 40rem) {
+        .projects {
+          padding: 40px 24px 80px;
+        }
+
+        .project {
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .project__video {
+          width: 100%;
+          height: 200px;
+        }
+      }
+
       @media (prefers-reduced-motion: reduce) {
         body,
         .sky-night,
@@ -566,14 +708,52 @@
         <span class="mood-label mood-label--dark">Dark</span>
       </div>
 
-      <div class="video-frame">
-        <video src="assets/embroidery.mp4" autoplay loop muted playsinline></video>
+      <div class="hero">
+        <div class="video-frame">
+          <video src="assets/embroidery.mp4" autoplay loop muted playsinline></video>
+        </div>
+
+        <div class="intro">
+          <p class="intro__title">Data Engineer & Entrepreneur</p>
+          <p class="intro__sub">Building data infrastructure and analytics with an engineering mindset, obsessing over detail and eager to embrace what's next.</p>
+        </div>
       </div>
 
-      <div class="intro">
-        <p class="intro__title">Data Engineer & Entrepreneur</p>
-        <p class="intro__sub">Building data infrastructure and analytics with an engineering mindset, obsessing over detail and eager to embrace what's next.</p>
-      </div>
+      <section class="projects">
+        <p class="projects__title">Projects</p>
+
+        <div class="projects__list">
+          <article class="project">
+            <div class="project__video">
+              <video autoplay loop muted playsinline preload="auto" poster="assets/project-hardware-demo-poster.jpg" aria-label="Laptop and electronics prototype demonstration">
+                <source src="assets/project-hardware-demo.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="project__info">
+              <p class="project__desc">An ESP32-powered display that uses the Spotify Web API to show album artwork, song, artist, and playback progress in real time. A physical button controls Play/Pause on the active Spotify device.</p>
+              <p class="project__stack-label">Stack</p>
+              <div class="project__logos">
+                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">Py</span></div>
+                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">AF</span></div>
+                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">dbt</span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="project">
+            <div class="project__video"></div>
+            <div class="project__info">
+              <p class="project__desc">Self-serve analytics tool enabling stakeholders to explore metrics and build custom dashboards with automated reporting.</p>
+              <p class="project__stack-label">Stack</p>
+              <div class="project__logos">
+                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">SQL</span></div>
+                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">BQ</span></div>
+                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">Lk</span></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
     </main>
 
     <script>

@@ -552,6 +552,91 @@
         object-fit: contain;
       }
 
+      .project__logos--interactive {
+        gap: 0;
+      }
+
+      .project__logos--interactive .project__logo {
+        position: relative;
+        width: 28px;
+        min-width: 28px;
+        max-width: 28px;
+        height: 28px;
+        flex-basis: 28px;
+        flex-shrink: 0;
+        border: 0.5px solid rgba(23, 22, 15, 0.12);
+        border-radius: 50%;
+        background: var(--logo-bg);
+        box-shadow: 0 0 0 1px rgba(250, 245, 245, 0.8);
+        outline: none;
+        transform-origin: center;
+        transform: translateY(var(--logo-shift, 0px)) scale(var(--logo-scale, 1));
+        transition:
+          transform 320ms var(--logo-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+          box-shadow 320ms ease;
+        will-change: transform;
+      }
+
+      .project__logos--interactive .project__logo + .project__logo {
+        margin-left: -6px;
+      }
+
+      .project__logos--interactive .project__logo:focus-visible {
+        box-shadow:
+          0 0 0 1px rgba(250, 245, 245, 0.8),
+          0 0 0 3px rgba(58, 83, 237, 0.35);
+      }
+
+      .project__logos--interactive .project__logo img {
+        width: 18px;
+        min-width: 18px;
+        max-width: 18px;
+        height: 18px;
+        flex: 0 0 18px;
+      }
+
+      .project__logos--interactive .project__logo::after {
+        content: attr(data-label);
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        z-index: 3;
+        padding: 4px 6px;
+        border: 1px solid rgba(250, 245, 245, 0.14);
+        border-radius: 4px;
+        background: #17160f;
+        box-shadow: 0 4px 12px rgba(23, 22, 15, 0.14);
+        color: #faf5f5;
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        font-size: 9px;
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, 4px);
+        transition: opacity 160ms ease, transform 160ms ease;
+      }
+
+      .project__logos--interactive .project__logo:hover::after,
+      .project__logos--interactive .project__logo:focus-visible::after {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      body.dark .project__logos--interactive .project__logo {
+        background: var(--logo-bg);
+        border-color: rgba(250, 245, 245, 0.14);
+        box-shadow: 0 0 0 1px rgba(25, 24, 23, 0.9);
+      }
+
+      body.dark .project__logos--interactive .project__logo::after {
+        border-color: rgba(23, 22, 15, 0.12);
+        background: #f5f3f0;
+        color: #17160f;
+      }
+
       @media (max-width: 40rem) {
         .projects {
           padding: 40px 24px 80px;
@@ -578,9 +663,18 @@
         .mood-label,
         .sidebar__text span,
         .sidebar__dots,
+        .project__logos--interactive .project__logo,
         .video-frame video,
         .video-frame::before,
         .video-frame::after {
+          transition: none !important;
+        }
+
+        .project__logos--interactive .project__logo {
+          transform: none !important;
+        }
+
+        .project__logos--interactive .project__logo::after {
           transition: none !important;
         }
       }
@@ -732,23 +826,27 @@
             <div class="project__info">
               <p class="project__desc">An ESP32-powered display that uses the Spotify Web API to show album artwork, song, artist, and playback progress in real time. A physical button controls Play/Pause on the active Spotify device.</p>
               <p class="project__stack-label">Stack</p>
-              <div class="project__logos">
-                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">Py</span></div>
-                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">AF</span></div>
-                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">dbt</span></div>
+              <div class="project__logos project__logos--interactive" aria-label="Project stack">
+                <span class="project__logo" style="--logo-bg:#17160f;" role="img" aria-label="Spotify" data-label="Spotify" tabindex="0"><img src="assets/spotify.svg" alt=""></span>
+                <span class="project__logo" style="--logo-bg:#f5f7fa;" role="img" aria-label="C++" data-label="C++" tabindex="0"><img src="assets/cplusplus.svg" alt=""></span>
+                <span class="project__logo" style="--logo-bg:#17160f;" role="img" aria-label="PlatformIO" data-label="PlatformIO" tabindex="0"><img src="assets/platformio.svg" alt=""></span>
               </div>
             </div>
           </article>
 
           <article class="project">
-            <div class="project__video"></div>
+            <div class="project__video">
+              <video autoplay loop muted playsinline preload="auto" poster="assets/project-openspace-demo-poster.jpg" aria-label="COOPER interactive satellite guide demonstration">
+                <source src="assets/project-openspace-demo.mp4" type="video/mp4">
+              </video>
+            </div>
             <div class="project__info">
-              <p class="project__desc">Self-serve analytics tool enabling stakeholders to explore metrics and build custom dashboards with automated reporting.</p>
+              <p class="project__desc">An interactive guide to 16,000+ active satellites, combining orbital data and mission details. Search any active satellite and explore its estimated position and ground track.</p>
               <p class="project__stack-label">Stack</p>
-              <div class="project__logos">
-                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">SQL</span></div>
-                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">BQ</span></div>
-                <div class="project__logo"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;color:#9b9b9b;">Lk</span></div>
+              <div class="project__logos project__logos--interactive" aria-label="Project stack">
+                <span class="project__logo" style="--logo-bg:#f5f3f0;" role="img" aria-label="Next.js" data-label="Next.js" tabindex="0"><img src="assets/nextdotjs.svg" alt=""></span>
+                <span class="project__logo" style="--logo-bg:#f5f7fa;" role="img" aria-label="MapLibre" data-label="MapLibre" tabindex="0"><img src="assets/maplibre.svg" alt=""></span>
+                <span class="project__logo" style="--logo-bg:#17160f;" role="img" aria-label="Supabase" data-label="Supabase" tabindex="0"><img src="assets/supabase.svg" alt=""></span>
               </div>
             </div>
           </article>
@@ -775,6 +873,42 @@
           switchSound.play()?.catch(() => {});
         } catch {}
       });
+
+      document.querySelectorAll(".project__logos--interactive").forEach((logoGroup) => {
+        const logos = [...logoGroup.querySelectorAll(".project__logo")];
+
+        const activateLogo = (activeIndex) => {
+          logos.forEach((logo, index) => {
+            const distance = Math.abs(index - activeIndex);
+            const shift = -4 * Math.pow(0.45, distance);
+
+            logo.style.setProperty("--logo-shift", `${shift.toFixed(3)}px`);
+            logo.style.setProperty("--logo-scale", index === activeIndex ? "1.05" : "1");
+            logo.style.setProperty("--logo-ease", "cubic-bezier(0.22, 1, 0.36, 1)");
+            logo.style.zIndex = index === activeIndex ? "2" : "1";
+          });
+        };
+
+        const resetLogos = () => {
+          logos.forEach((logo) => {
+            logo.style.setProperty("--logo-shift", "0px");
+            logo.style.setProperty("--logo-scale", "1");
+            logo.style.setProperty("--logo-ease", "cubic-bezier(0.34, 3.85, 0.64, 1)");
+            logo.style.zIndex = "1";
+          });
+        };
+
+        logos.forEach((logo, index) => {
+          logo.addEventListener("pointerenter", () => activateLogo(index));
+          logo.addEventListener("focus", () => activateLogo(index));
+        });
+
+        logoGroup.addEventListener("pointerleave", resetLogos);
+        logoGroup.addEventListener("focusout", (event) => {
+          if (!logoGroup.contains(event.relatedTarget)) resetLogos();
+        });
+      });
+
     </script>
   </body>
 </html>

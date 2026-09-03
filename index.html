@@ -292,6 +292,13 @@
           top: 16px;
           right: 16px;
           gap: 10px;
+          transition: opacity 300ms ease, transform 300ms ease;
+        }
+
+        .mood-toggle-wrapper.is-hidden {
+          opacity: 0;
+          transform: translateY(-20px);
+          pointer-events: none;
         }
 
         .mood-label {
@@ -301,6 +308,13 @@
         .sidebar {
           top: 16px;
           left: 16px;
+          transition: opacity 300ms ease, transform 300ms ease;
+        }
+
+        .sidebar.is-hidden {
+          opacity: 0;
+          transform: translateY(-20px);
+          pointer-events: none;
         }
 
         .sidebar__text span {
@@ -342,7 +356,7 @@
       }
 
       body.dark .video-frame video {
-        filter: brightness(0.35) saturate(0.6);
+        filter: brightness(0.65) saturate(0.8);
       }
 
       /* Gradient overlays — fade edges into page background */
@@ -446,7 +460,7 @@
         line-height: 1.8;
         letter-spacing: -0.12px;
         color: #060606;
-        margin: 0 0 32px;
+        margin: 0 0 32px 48px;
         transition: color 500ms ease;
       }
 
@@ -470,7 +484,7 @@
       }
 
       .work__title {
-        margin: 0 0 32px;
+        margin: 0 0 32px 48px;
         color: #060606;
         font-family: 'Inter', system-ui, sans-serif;
         font-size: 16px;
@@ -487,13 +501,12 @@
       .work__grid {
         display: grid;
         grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
-        grid-template-rows: repeat(2, minmax(180px, 1fr));
+        grid-template-rows: repeat(2, minmax(120px, auto));
         gap: 16px;
-        min-height: 440px;
       }
 
       .work-card {
-        --work-card-delay: 0ms;
+        --reveal-delay: 0ms;
         position: relative;
         display: flex;
         min-width: 0;
@@ -506,9 +519,8 @@
         background: rgba(255, 255, 255, 0.38);
         box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset;
         transition:
-          opacity 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--work-card-delay),
-          transform 1200ms cubic-bezier(0.16, 1.16, 0.3, 1) var(--work-card-delay),
-          filter 900ms cubic-bezier(0.22, 1, 0.36, 1) var(--work-card-delay),
+          opacity 400ms cubic-bezier(0.215, 0.61, 0.355, 1) var(--reveal-delay),
+          transform 400ms cubic-bezier(0.215, 0.61, 0.355, 1) var(--reveal-delay),
           border-color 500ms ease,
           background 500ms ease,
           box-shadow 500ms ease;
@@ -522,31 +534,53 @@
           rgba(255, 255, 255, 0.48);
       }
 
-      .work-card:nth-child(2) { --work-card-delay: 50ms; }
-      .work-card:nth-child(3) { --work-card-delay: 100ms; }
+      .work-card:nth-child(2) { --reveal-delay: 60ms; }
+      .work-card:nth-child(3) { --reveal-delay: 120ms; }
 
-      .js .work-card {
+      .js [data-reveal] {
         opacity: 0;
-        filter: blur(4px);
-        transform: translateY(40px);
+        transform: translateY(16px);
       }
 
-      .js .work.is-visible .work-card {
+      .js [data-reveal].is-visible {
         opacity: 1;
-        filter: blur(0);
         transform: translateY(0);
       }
 
       body.dark .work-card {
         border-color: rgba(250, 245, 245, 0.1);
-        background: rgba(250, 245, 245, 0.035);
+        background: transparent;
         box-shadow: 0 1px 0 rgba(250, 245, 245, 0.04) inset;
       }
 
       body.dark .work-card--current {
-        background:
-          radial-gradient(circle at 84% 16%, rgba(116, 146, 80, 0.15), transparent 38%),
-          rgba(250, 245, 245, 0.05);
+        background: transparent;
+      }
+
+      .work-card__shader {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        border-radius: inherit;
+        overflow: hidden;
+        opacity: 0.55;
+        transition: opacity 500ms ease;
+      }
+
+      .work-card__shader canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .work-card__shader {
+          opacity: 0.3;
+        }
+      }
+
+      body.dark .work-card__shader {
+        opacity: 0.55;
       }
 
       .work-card__top,
@@ -637,9 +671,17 @@
       }
 
       .project {
+        --reveal-delay: 0ms;
         display: flex;
         gap: 32px;
         align-items: flex-start;
+        transition:
+          opacity 360ms cubic-bezier(0.215, 0.61, 0.355, 1) var(--reveal-delay),
+          transform 360ms cubic-bezier(0.215, 0.61, 0.355, 1) var(--reveal-delay);
+      }
+
+      .project:nth-child(2) {
+        --reveal-delay: 60ms;
       }
 
       .project__video {
@@ -661,6 +703,18 @@
         height: 100%;
         object-fit: cover;
         display: block;
+        transform: scale(1);
+        transform-origin: center;
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        .project__video video {
+          transition: transform 180ms ease;
+        }
+
+        .project:hover .project__video video {
+          transform: scale(1.015);
+        }
       }
 
       .project__info {
@@ -749,8 +803,8 @@
         transform-origin: center;
         transform: translateY(var(--logo-shift, 0px)) scale(var(--logo-scale, 1));
         transition:
-          transform 320ms var(--logo-ease, cubic-bezier(0.22, 1, 0.36, 1)),
-          box-shadow 320ms ease;
+          transform 180ms var(--logo-ease, cubic-bezier(0.215, 0.61, 0.355, 1)),
+          box-shadow 180ms ease;
         will-change: transform;
       }
 
@@ -819,6 +873,11 @@
           padding: 40px 24px 80px;
         }
 
+        .projects__title,
+        .work__title {
+          margin-left: 0;
+        }
+
         .work {
           padding: 24px 24px 96px;
         }
@@ -865,24 +924,29 @@
         .sidebar__text span,
         .sidebar__dots,
         .project__logos--interactive .project__logo,
+        .project,
         .work-card,
+        .project__video video,
         .video-frame video,
         .video-frame::before,
         .video-frame::after {
-          transition: none !important;
+          transition: none;
         }
 
         .project__logos--interactive .project__logo {
-          transform: none !important;
+          transform: none;
         }
 
         .project__logos--interactive .project__logo::after {
-          transition: none !important;
+          transition: none;
         }
 
-        .js .work-card {
+        .project:hover .project__video video {
+          transform: none;
+        }
+
+        .js [data-reveal] {
           opacity: 1;
-          filter: none;
           transform: none;
         }
       }
@@ -1021,11 +1085,11 @@
         </div>
       </div>
 
-      <section class="projects">
-        <p class="projects__title">Projects</p>
+      <section class="projects" aria-labelledby="projects-title">
+        <p class="projects__title" id="projects-title">Projects</p>
 
         <div class="projects__list">
-          <article class="project">
+          <article class="project" data-reveal>
             <div class="project__video">
               <video autoplay loop muted playsinline preload="auto" poster="assets/project-hardware-demo-poster.jpg" aria-label="Laptop and electronics prototype demonstration">
                 <source src="assets/project-hardware-demo.mp4" type="video/mp4">
@@ -1042,7 +1106,7 @@
             </div>
           </article>
 
-          <article class="project">
+          <article class="project" data-reveal>
             <div class="project__video">
               <video autoplay loop muted playsinline preload="auto" poster="assets/project-openspace-demo-poster.jpg" aria-label="COOPER interactive satellite guide demonstration">
                 <source src="assets/project-openspace-demo.mp4" type="video/mp4">
@@ -1066,7 +1130,8 @@
 
         <div class="work__grid">
           <!-- Replace the company, role, period, and summary with your work history. -->
-          <article class="work-card work-card--current">
+          <article class="work-card work-card--current" data-reveal data-shader-colors="#FAF5F5,#C4A882,#8B7355,#DDD0BF">
+            <div class="work-card__shader" aria-hidden="true"></div>
             <div class="work-card__top">
               <p class="work-card__eyebrow">Current position</p>
               <h2 class="work-card__role">Data Engineer</h2>
@@ -1078,7 +1143,8 @@
             </div>
           </article>
 
-          <article class="work-card">
+          <article class="work-card" data-reveal data-shader-colors="#E8E4E0,#7A7D80,#A8ADB3,#C5C8CC">
+            <div class="work-card__shader" aria-hidden="true"></div>
             <div class="work-card__top">
               <p class="work-card__eyebrow">Previous position</p>
               <h2 class="work-card__role">Data &amp; Analytics</h2>
@@ -1089,7 +1155,8 @@
             </div>
           </article>
 
-          <article class="work-card">
+          <article class="work-card" data-reveal data-shader-colors="#A8A5A0,#2A2825,#4D4B47,#787570">
+            <div class="work-card__shader" aria-hidden="true"></div>
             <div class="work-card__top">
               <p class="work-card__eyebrow">Previous position</p>
               <h2 class="work-card__role">Engineering</h2>
@@ -1133,7 +1200,7 @@
 
             logo.style.setProperty("--logo-shift", `${shift.toFixed(3)}px`);
             logo.style.setProperty("--logo-scale", index === activeIndex ? "1.05" : "1");
-            logo.style.setProperty("--logo-ease", "cubic-bezier(0.22, 1, 0.36, 1)");
+            logo.style.setProperty("--logo-ease", "cubic-bezier(0.215, 0.61, 0.355, 1)");
             logo.style.zIndex = index === activeIndex ? "2" : "1";
           });
         };
@@ -1142,7 +1209,7 @@
           logos.forEach((logo) => {
             logo.style.setProperty("--logo-shift", "0px");
             logo.style.setProperty("--logo-scale", "1");
-            logo.style.setProperty("--logo-ease", "cubic-bezier(0.34, 3.85, 0.64, 1)");
+            logo.style.setProperty("--logo-ease", "cubic-bezier(0.215, 0.61, 0.355, 1)");
             logo.style.zIndex = "1";
           });
         };
@@ -1158,13 +1225,14 @@
         });
       });
 
-      const workSection = document.querySelector(".work");
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const revealItems = [...document.querySelectorAll("[data-reveal]")];
+      const autoplayVideos = [...document.querySelectorAll("video[autoplay]")];
 
       if (prefersReducedMotion.matches || !("IntersectionObserver" in window)) {
-        workSection.classList.add("is-visible");
+        revealItems.forEach((item) => item.classList.add("is-visible"));
       } else {
-        const workObserver = new IntersectionObserver((entries, observer) => {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
           entries.forEach((entry) => {
             if (!entry.isIntersecting) return;
 
@@ -1172,13 +1240,124 @@
             observer.unobserve(entry.target);
           });
         }, {
-          threshold: 0.2,
+          threshold: 0.15,
           rootMargin: "0px 0px -10%",
         });
 
-        workObserver.observe(workSection);
+        revealItems.forEach((item) => revealObserver.observe(item));
       }
 
+      let videoObserver;
+
+      const observeAutoplayVideos = () => {
+        videoObserver?.disconnect();
+
+        if (prefersReducedMotion.matches) {
+          autoplayVideos.forEach((video) => video.pause());
+          return;
+        }
+
+        if (!("IntersectionObserver" in window)) {
+          autoplayVideos.forEach((video) => video.play()?.catch(() => {}));
+          return;
+        }
+
+        videoObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.play()?.catch(() => {});
+            } else {
+              entry.target.pause();
+            }
+          });
+        }, { threshold: 0.15 });
+
+        autoplayVideos.forEach((video) => videoObserver.observe(video));
+      };
+
+      observeAutoplayVideos();
+
+      prefersReducedMotion.addEventListener("change", () => {
+        if (prefersReducedMotion.matches) {
+          revealItems.forEach((item) => item.classList.add("is-visible"));
+        }
+
+        observeAutoplayVideos();
+      });
+
+      // Hide sidebar + toggle on scroll down, show on scroll up (mobile only)
+      const isMobile = () => window.matchMedia('(max-width: 40rem)').matches;
+      const sidebar = document.querySelector('.sidebar');
+      const toggleWrapper = document.querySelector('.mood-toggle-wrapper');
+      let lastScrollY = 0;
+      let ticking = false;
+
+      window.addEventListener('scroll', () => {
+        if (!isMobile() || ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          const currentY = window.scrollY;
+          const scrollingDown = currentY > lastScrollY && currentY > 60;
+
+          sidebar.classList.toggle('is-hidden', scrollingDown);
+          toggleWrapper.classList.toggle('is-hidden', scrollingDown);
+
+          lastScrollY = currentY;
+          ticking = false;
+        });
+      }, { passive: true });
+
+    </script>
+
+    <script type="module">
+      import {
+        ShaderMount,
+        meshGradientFragmentShader,
+        getShaderColorFromString,
+      } from 'https://esm.sh/@paper-design/shaders@0.0.80';
+
+      const shaderCards = document.querySelectorAll('[data-shader-colors]');
+      const shaderMounts = [];
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const shaderSpeed = reducedMotion.matches ? 0 : 1.4;
+
+      shaderCards.forEach((card) => {
+        const container = card.querySelector('.work-card__shader');
+        if (!container) return;
+
+        const colorStrings = card.dataset.shaderColors.split(',');
+        const colors = colorStrings.map((c) => getShaderColorFromString(c.trim()));
+
+        const mount = new ShaderMount(container, meshGradientFragmentShader, {
+          u_colors: colors,
+          u_colorsCount: colors.length,
+          u_distortion: 1.0,
+          u_swirl: 0.5,
+          u_scale: 2,
+          u_rotation: 0,
+          u_offsetX: 0,
+          u_offsetY: 0,
+        }, undefined, shaderSpeed);
+
+        shaderMounts.push({ mount, card });
+      });
+
+      reducedMotion.addEventListener('change', () => {
+        const speed = reducedMotion.matches ? 0 : 1.4;
+        shaderMounts.forEach(({ mount }) => mount.setSpeed(speed));
+      });
+
+      if ('IntersectionObserver' in window) {
+        const shaderObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            const item = shaderMounts.find((s) => s.card === entry.target);
+            if (!item || reducedMotion.matches) return;
+            item.mount.setSpeed(entry.isIntersecting ? shaderSpeed : 0);
+          });
+        }, { threshold: 0.05 });
+
+        shaderMounts.forEach(({ card }) => shaderObserver.observe(card));
+      }
     </script>
   </body>
 </html>

@@ -498,44 +498,127 @@
         color: #f5f3f0;
       }
 
+      /* Shared reference: Paper / Portfolio / Style Reference + Layout & Patterns. */
+      .work {
+        --work-ink: #060606;
+        --work-text: #434445;
+        --work-muted: #6c6b67;
+        --work-accent: #3a53ed;
+      }
+
       .work__grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
-        grid-template-rows: repeat(2, minmax(120px, auto));
-        gap: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 56px;
+        padding-left: 0;
       }
 
       .work-card {
-        --reveal-delay: 0ms;
-        position: relative;
-        display: flex;
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 220px;
+        align-items: center;
+        gap: 32px;
         min-width: 0;
-        overflow: hidden;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 24px;
-        border: 1px solid rgba(23, 22, 15, 0.1);
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.38);
-        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset;
-        transition:
-          opacity 400ms cubic-bezier(0.215, 0.61, 0.355, 1) var(--reveal-delay),
-          transform 400ms cubic-bezier(0.215, 0.61, 0.355, 1) var(--reveal-delay),
-          border-color 500ms ease,
-          background 500ms ease,
-          box-shadow 500ms ease;
+        font-family: 'Inter', system-ui, sans-serif;
+        letter-spacing: -0.0075em;
       }
 
-      .work-card--current {
-        grid-row: 1 / 3;
-        padding: 32px;
-        background:
-          radial-gradient(circle at 84% 16%, rgba(142, 166, 109, 0.24), transparent 36%),
-          rgba(255, 255, 255, 0.48);
+      .work-card__logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        margin-bottom: 16px;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        background: #fff;
       }
 
-      .work-card:nth-child(2) { --reveal-delay: 60ms; }
-      .work-card:nth-child(3) { --reveal-delay: 120ms; }
+      .work-card__logo img {
+        display: block;
+        max-width: 46px;
+        height: auto;
+        object-fit: contain;
+      }
+
+      .work-card__heading {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 6px 14px;
+      }
+
+      .work-card__company {
+        margin: 0;
+        color: var(--work-ink);
+        font-size: 18px;
+        font-weight: 500;
+        line-height: 26px;
+      }
+
+      .work-card__period {
+        margin: 0;
+        color: var(--work-muted);
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 18px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .work-card__period--current { color: var(--work-accent); }
+
+      .work-card__role {
+        margin: 6px 0 8px;
+        color: var(--work-text);
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 25px;
+      }
+
+      .work-card__summary {
+        margin: 0;
+        color: var(--work-muted);
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 25px;
+        text-wrap: pretty;
+      }
+
+      body.dark .work {
+        --work-ink: #f5f3f0;
+        --work-text: #b9b8b6;
+        --work-muted: #a09f9c;
+        --work-accent: #9caaff;
+      }
+
+      .work-card__content { min-width: 0; }
+
+      .work-gallery { min-width: 0; width: 220px; }
+      .work-gallery__viewport {
+        display: flex;
+        width: 100%;
+        height: 140px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        border-radius: 6px;
+        background: #e8e4de;
+      }
+      .work-gallery__viewport::-webkit-scrollbar { display: none; }
+      .work-gallery__slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; }
+      .work-gallery__slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+      .work-gallery__viewport:focus-visible { outline: 2px solid var(--work-accent); outline-offset: 3px; }
+      body.dark .work-gallery__viewport { background: #2a2826; }
+      @media (max-width: 40rem) {
+        .work-card { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+        .work-gallery { width: 100%; }
+        .work-gallery__viewport { height: 200px; }
+      }
 
       .js [data-reveal] {
         opacity: 0;
@@ -547,140 +630,22 @@
         transform: translateY(0);
       }
 
-      body.dark .work-card {
-        border-color: rgba(250, 245, 245, 0.1);
-        background: transparent;
-        box-shadow: 0 1px 0 rgba(250, 245, 245, 0.04) inset;
-      }
-
-      body.dark .work-card--current {
-        background: transparent;
-      }
-
-      .work-card__shader {
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        border-radius: inherit;
-        overflow: hidden;
-        opacity: 0.55;
-        transition: opacity 500ms ease;
-      }
-
-      .work-card__shader canvas {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .work-card__shader {
-          opacity: 0.3;
-        }
-      }
-
-      body.dark .work-card__shader {
-        opacity: 0.55;
-      }
-
-      .work-card__top,
-      .work-card__footer {
-        position: relative;
-        z-index: 1;
-      }
-
-      .work-card__eyebrow,
-      .work-card__period {
-        margin: 0;
-        color: #6c6b67;
-        font-family: 'IBM Plex Mono', ui-monospace, monospace;
-        font-size: 10px;
-        font-weight: 500;
-        line-height: 1.4;
-        letter-spacing: 1.2px;
-        text-transform: uppercase;
-        transition: color 500ms ease;
-      }
-
-      .work-card__role {
-        max-width: 13ch;
-        margin: 16px 0 4px;
-        color: #17160f;
-        font-family: 'Inter', system-ui, sans-serif;
-        font-size: 24px;
-        font-weight: 500;
-        line-height: 1.15;
-        letter-spacing: -0.6px;
-        transition: color 500ms ease;
-      }
-
-      .work-card--current .work-card__role {
-        max-width: 11ch;
-        margin-top: 22px;
-        font-size: clamp(34px, 4vw, 52px);
-        letter-spacing: -1.8px;
-      }
-
-      .work-card__company {
-        margin: 0;
-        color: #434445;
-        font-family: 'Inter', system-ui, sans-serif;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 1.5;
-        letter-spacing: -0.12px;
-        transition: color 500ms ease;
-      }
-
-      .work-card__footer {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 20px;
-        margin-top: 28px;
-      }
-
-      .work-card__summary {
-        max-width: 46ch;
-        margin: 0;
-        color: #434445;
-        font-family: 'Inter', system-ui, sans-serif;
-        font-size: 13px;
-        font-weight: 400;
-        line-height: 1.6;
-        letter-spacing: -0.08px;
-        transition: color 500ms ease;
-      }
-
-      .work-card:not(.work-card--current) .work-card__summary {
-        display: none;
-      }
-
-      body.dark .work-card__eyebrow,
-      body.dark .work-card__period {
-        color: #8d8c89;
-      }
-
-      body.dark .work-card__role {
-        color: #f5f3f0;
-      }
-
-      body.dark .work-card__company,
-      body.dark .work-card__summary {
-        color: #b9b8b6;
-      }
-
-      .project {
+      .project,
+      .work-card {
         --reveal-delay: 0ms;
-        display: flex;
-        gap: 32px;
-        align-items: flex-start;
         transition:
           opacity 360ms cubic-bezier(0.215, 0.61, 0.355, 1) var(--reveal-delay),
           transform 360ms cubic-bezier(0.215, 0.61, 0.355, 1) var(--reveal-delay);
       }
 
-      .project:nth-child(2) {
+      .project {
+        display: flex;
+        gap: 32px;
+        align-items: flex-start;
+      }
+
+      .project:nth-child(2),
+      .work-card:nth-child(2) {
         --reveal-delay: 60ms;
       }
 
@@ -883,23 +848,8 @@
         }
 
         .work__grid {
-          display: flex;
-          min-height: 0;
-          flex-direction: column;
-        }
-
-        .work-card,
-        .work-card--current {
-          min-height: 210px;
-          padding: 24px;
-        }
-
-        .work-card--current {
-          min-height: 360px;
-        }
-
-        .work-card--current .work-card__role {
-          font-size: 38px;
+          padding-left: 0;
+          gap: 48px;
         }
 
         .project {
@@ -1129,47 +1079,68 @@
         <p class="work__title" id="work-title">Work</p>
 
         <div class="work__grid">
-          <!-- Replace the company, role, period, and summary with your work history. -->
-          <article class="work-card work-card--current" data-reveal data-shader-colors="#FAF5F5,#C4A882,#8B7355,#DDD0BF">
-            <div class="work-card__shader" aria-hidden="true"></div>
-            <div class="work-card__top">
-              <p class="work-card__eyebrow">Current position</p>
-              <h2 class="work-card__role">Data Engineer</h2>
-              <p class="work-card__company">Current company</p>
+          <article class="work-card" data-reveal aria-labelledby="work-mibanco">
+            <div class="work-card__content">
+            <div class="work-card__logo"><img src="assets/mibanco.svg" width="79" height="40" alt="" loading="lazy"></div>
+            <div class="work-card__heading">
+              <h2 class="work-card__company" id="work-mibanco">Mibanco</h2>
+              <p class="work-card__period work-card__period--current">Current</p>
             </div>
-            <div class="work-card__footer">
-              <p class="work-card__summary">Building reliable data infrastructure and analytics systems with an engineering-first approach.</p>
-              <p class="work-card__period">Present</p>
+            <p class="work-card__role">Data Engineer</p>
+            <p class="work-card__summary">Part of the core AI team behind Mibanco por WhatsApp, a conversational neobank built with AWS. Serving 50,000+ registered users, with over 1,000 loans issued through the agent each day.</p>
             </div>
-          </article>
-
-          <article class="work-card" data-reveal data-shader-colors="#E8E4E0,#7A7D80,#A8ADB3,#C5C8CC">
-            <div class="work-card__shader" aria-hidden="true"></div>
-            <div class="work-card__top">
-              <p class="work-card__eyebrow">Previous position</p>
-              <h2 class="work-card__role">Data &amp; Analytics</h2>
-              <p class="work-card__company">Previous company</p>
-            </div>
-            <div class="work-card__footer">
-              <p class="work-card__period">Earlier</p>
+            <div class="work-gallery" role="region" aria-roledescription="carousel" aria-label="Mibanco team photos">
+              <div class="work-gallery__viewport" id="mibanco-photos" tabindex="0" aria-label="Photos. Use left and right arrow keys to browse.">
+                <div class="work-gallery__slide" role="group" aria-roledescription="slide" aria-label="1 of 3"><img src="assets/mibanco-team-event.jpg" width="4160" height="3120" alt="Mibanco team together at a Mibanco por WhatsApp event" loading="lazy" decoding="async"></div>
+                <div class="work-gallery__slide" role="group" aria-roledescription="slide" aria-label="2 of 3"><img src="assets/mibanco-team-lunch.jpg" width="1600" height="900" alt="Mibanco colleagues sharing lunch at a restaurant" loading="lazy" decoding="async"></div>
+                <div class="work-gallery__slide" role="group" aria-roledescription="slide" aria-label="3 of 3"><img src="assets/mibanco-team-office.jpg" width="1280" height="720" alt="Mibanco team posing together in the office" loading="lazy" decoding="async"></div>
+              </div>
             </div>
           </article>
 
-          <article class="work-card" data-reveal data-shader-colors="#A8A5A0,#2A2825,#4D4B47,#787570">
-            <div class="work-card__shader" aria-hidden="true"></div>
-            <div class="work-card__top">
-              <p class="work-card__eyebrow">Previous position</p>
-              <h2 class="work-card__role">Engineering</h2>
-              <p class="work-card__company">Previous company</p>
+          <article class="work-card" data-reveal aria-labelledby="work-interbank">
+            <div class="work-card__content">
+            <div class="work-card__logo"><img src="assets/interbank.png" width="108" height="21" alt="" loading="lazy"></div>
+            <div class="work-card__heading">
+              <h2 class="work-card__company" id="work-interbank">Interbank</h2>
+              <p class="work-card__period">2024–2025</p>
             </div>
-            <div class="work-card__footer">
-              <p class="work-card__period">Earlier</p>
+            <p class="work-card__role">Data Analyst</p>
+            <p class="work-card__summary">Owned small-business data pipelines in the recoveries division at one of Peru’s four largest banks. Built reports to track recovery performance using Excel, Visual Studio, and Power BI.</p>
+            </div>
+            <div class="work-gallery" role="region" aria-roledescription="carousel" aria-label="Interbank photos">
+              <div class="work-gallery__viewport" id="interbank-photos" tabindex="0" aria-label="Photos. Use left and right arrow keys to browse.">
+                <div class="work-gallery__slide" role="group" aria-roledescription="slide" aria-label="1 of 3"><img src="assets/interbank-team.jpg" width="1200" height="1600" style="object-position: center 35%" alt="Colleagues beside a decorated doorway at Interbank" loading="lazy" decoding="async"></div>
+                <div class="work-gallery__slide" role="group" aria-roledescription="slide" aria-label="2 of 3"><img src="assets/interbank-run.jpg" width="1239" height="1670" style="object-position: center 25%" alt="Runner wearing an Interbank shirt during a race" loading="lazy" decoding="async"></div>
+                <div class="work-gallery__slide" role="group" aria-roledescription="slide" aria-label="3 of 3"><img src="assets/interbank-celebration.jpg" width="4160" height="3120" alt="Three colleagues at an Interbank celebration with silver and green balloons" loading="lazy" decoding="async"></div>
+              </div>
             </div>
           </article>
+
+          <article class="work-card" data-reveal aria-labelledby="work-rappi">
+            <div class="work-card__content">
+            <div class="work-card__logo"><img src="assets/rappi.png" width="32" height="32" alt="" loading="lazy"></div>
+            <div class="work-card__heading">
+              <h2 class="work-card__company" id="work-rappi">Rappi</h2>
+              <p class="work-card__period">2022–2024</p>
+            </div>
+            <p class="work-card__role">BI Analyst</p>
+            <p class="work-card__summary">Part of the Growth team at Rappi, a Latin American delivery and commerce super-app valued at over $5B. Built acquisition, communications, and Rappi Pro data pipelines with Apache Airflow and Snowflake.</p>
+            </div>
+            <div class="work-gallery" role="region" aria-roledescription="carousel" aria-label="Rappi photos">
+              <div class="work-gallery__viewport" id="rappi-photos" tabindex="0" aria-label="Photos. Use left and right arrow keys to browse.">
+                <div class="work-gallery__slide" role="group" aria-roledescription="slide" aria-label="1 of 3"><img src="assets/rappi-0254.jpg" width="1200" height="1600" alt="Trying on a Rappi delivery backpack at the office" loading="lazy" decoding="async"></div>
+                <div class="work-gallery__slide" role="group" aria-roledescription="slide" aria-label="2 of 3"><img src="assets/rappi-0074.jpg" width="1200" height="1600" style="object-position: center 60%" alt="Three colleagues together behind a Rappi sign at an outdoor event" loading="lazy" decoding="async"></div>
+                <div class="work-gallery__slide" role="group" aria-roledescription="slide" aria-label="3 of 3"><img src="assets/rappi-0072.jpg" width="1600" height="1200" alt="Posing in front of the illustrated Rappi Perú 2022 event backdrop" loading="lazy" decoding="async"></div>
+              </div>
+            </div>
+          </article>
+
         </div>
       </section>
     </main>
 
+    <script src="work-gallery.js" defer></script>
     <script>
       const toggle = document.querySelector(".mood-toggle");
       const switchSound = new Audio("assets/switch.m4a");
@@ -1309,55 +1280,5 @@
 
     </script>
 
-    <script type="module">
-      import {
-        ShaderMount,
-        meshGradientFragmentShader,
-        getShaderColorFromString,
-      } from 'https://esm.sh/@paper-design/shaders@0.0.80';
-
-      const shaderCards = document.querySelectorAll('[data-shader-colors]');
-      const shaderMounts = [];
-      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      const shaderSpeed = reducedMotion.matches ? 0 : 1.4;
-
-      shaderCards.forEach((card) => {
-        const container = card.querySelector('.work-card__shader');
-        if (!container) return;
-
-        const colorStrings = card.dataset.shaderColors.split(',');
-        const colors = colorStrings.map((c) => getShaderColorFromString(c.trim()));
-
-        const mount = new ShaderMount(container, meshGradientFragmentShader, {
-          u_colors: colors,
-          u_colorsCount: colors.length,
-          u_distortion: 1.0,
-          u_swirl: 0.5,
-          u_scale: 2,
-          u_rotation: 0,
-          u_offsetX: 0,
-          u_offsetY: 0,
-        }, undefined, shaderSpeed);
-
-        shaderMounts.push({ mount, card });
-      });
-
-      reducedMotion.addEventListener('change', () => {
-        const speed = reducedMotion.matches ? 0 : 1.4;
-        shaderMounts.forEach(({ mount }) => mount.setSpeed(speed));
-      });
-
-      if ('IntersectionObserver' in window) {
-        const shaderObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            const item = shaderMounts.find((s) => s.card === entry.target);
-            if (!item || reducedMotion.matches) return;
-            item.mount.setSpeed(entry.isIntersecting ? shaderSpeed : 0);
-          });
-        }, { threshold: 0.05 });
-
-        shaderMounts.forEach(({ card }) => shaderObserver.observe(card));
-      }
-    </script>
   </body>
 </html>

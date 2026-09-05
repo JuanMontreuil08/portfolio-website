@@ -34,7 +34,10 @@
       }
 
       main {
+        padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px));
       }
+
+      html { scroll-padding-bottom: calc(176px + env(safe-area-inset-bottom, 0px)); }
 
       .hero {
         position: relative;
@@ -479,7 +482,7 @@
         position: relative;
         top: -30vh;
         max-width: 1200px;
-        margin: 0 auto;
+        margin: 0 auto -30vh;
         padding: 24px 80px 140px 140px;
       }
 
@@ -900,6 +903,123 @@
           transform: none;
         }
       }
+      /* Footer controls float within the fixed decorative bottom veil. */
+      .site-footer,
+      .footer-veil {
+        --footer-muted: #747474;
+        --footer-ink: #5c5b5b;
+        --footer-pill: #f2f0f0;
+        --footer-tint: 255 255 255;
+      }
+
+      body.dark .site-footer,
+      body.dark .footer-veil {
+        --footer-muted: #929191;
+        --footer-ink: #d6d4d1;
+        --footer-pill: #2b2928;
+        --footer-tint: 25 24 23;
+      }
+
+      .site-footer {
+        position: fixed;
+        inset: auto 0 0;
+        z-index: 11;
+        padding: 16px 24px calc(23px + env(safe-area-inset-bottom, 0px));
+        pointer-events: none;
+      }
+
+      .site-footer__nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 8px 17px;
+      }
+
+      .site-footer__link {
+        pointer-events: auto;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 44px;
+        min-width: 44px;
+        padding: 2px 10px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--footer-muted);
+        font: 500 12px/1.8 'IBM Plex Mono', ui-monospace, monospace;
+        letter-spacing: 2.16px;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        touch-action: manipulation;
+        transition: color 160ms cubic-bezier(0.23, 1, 0.32, 1),
+          background-color 160ms cubic-bezier(0.23, 1, 0.32, 1);
+      }
+
+      .site-footer__link span {
+        display: inline-block;
+        transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+      }
+
+      .site-footer__link:focus-visible {
+        color: var(--footer-ink);
+        background: var(--footer-pill);
+        outline: 2px solid var(--footer-ink);
+        outline-offset: 3px;
+      }
+
+      .site-footer__link:focus-visible span { transform: scale(1.05); }
+
+      @media (hover: hover) and (pointer: fine) {
+        .site-footer__link:hover {
+          color: var(--footer-ink);
+          background: var(--footer-pill);
+        }
+        .site-footer__link:hover span { transform: scale(1.05); }
+      }
+
+      .footer-veil {
+        position: fixed;
+        inset: auto 0 0;
+        height: 160px;
+        z-index: 10;
+        pointer-events: none;
+      }
+
+      .footer-veil__layer {
+        position: absolute;
+        inset: 0;
+        -webkit-backdrop-filter: blur(var(--blur));
+        backdrop-filter: blur(var(--blur));
+        -webkit-mask-image: linear-gradient(to bottom, transparent var(--fade), black var(--solid));
+        mask-image: linear-gradient(to bottom, transparent var(--fade), black var(--solid));
+      }
+
+      .footer-veil::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgb(var(--footer-tint) / 0), rgb(var(--footer-tint) / 55%) 55%, rgb(var(--footer-tint) / 90%));
+      }
+
+      /* Keep keyboard-focused content crisp even while it crosses the veil. */
+      body:has(main :focus-visible) .footer-veil { visibility: hidden; }
+
+      @media (max-width: 40rem) {
+        .site-footer { padding-inline: 12px; }
+        .site-footer__nav { column-gap: 4px; }
+        .site-footer__link { padding-inline: 6px; letter-spacing: 1.1px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        .site-footer__link,
+        .site-footer__link span { transition: none; }
+        .site-footer .site-footer__link span { transform: none; }
+      }
+
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1140,6 +1260,22 @@
       </section>
     </main>
 
+    <div class="footer-veil" aria-hidden="true">
+      <div class="footer-veil__layer" style="--blur: 0.6px; --fade: 0%; --solid: 8%"></div>
+      <div class="footer-veil__layer" style="--blur: 1.5px; --fade: 20%; --solid: 45%"></div>
+      <div class="footer-veil__layer" style="--blur: 3px; --fade: 40%; --solid: 65%"></div>
+      <div class="footer-veil__layer" style="--blur: 6px; --fade: 58%; --solid: 80%"></div>
+      <div class="footer-veil__layer" style="--blur: 12px; --fade: 75%; --solid: 92%"></div>
+    </div>
+    <footer class="site-footer">
+      <nav class="site-footer__nav" aria-label="Footer">
+        <button class="site-footer__link" id="return-to-top" type="button" aria-label="Return to top"><span>Return to top</span></button>
+        <a class="site-footer__link" href="https://www.linkedin.com/in/juan-montreuil/" target="_blank" rel="noreferrer noopener"><span>LinkedIn</span></a>
+        <a class="site-footer__link" href="https://x.com/yeiyeiai" target="_blank" rel="noreferrer noopener"><span>X</span></a>
+        <a class="site-footer__link" href="https://github.com/JuanMontreuil08" target="_blank" rel="noreferrer noopener"><span>GitHub</span></a>
+      </nav>
+    </footer>
+
     <script src="work-gallery.js" defer></script>
     <script>
       const toggle = document.querySelector(".mood-toggle");
@@ -1197,6 +1333,14 @@
       });
 
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      document.getElementById("return-to-top").addEventListener("click", () => {
+        if (prefersReducedMotion.matches) {
+          window.scrollTo({ top: 0, behavior: "instant" });
+        } else {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
+
       const revealItems = [...document.querySelectorAll("[data-reveal]")];
       const autoplayVideos = [...document.querySelectorAll("video[autoplay]")];
 

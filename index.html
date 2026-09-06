@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="A personal portfolio.">
     <title>Portfolio</title>
+    <link rel="stylesheet" href="intro.css">
+    <script>
+      if (!location.hash && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('intro-pending');
+        // Fail open if the intro script cannot load.
+        window.introSafetyTimer = setTimeout(() => {
+          document.documentElement.classList.remove('intro-pending');
+          const content = document.getElementById('portfolio-content');
+          if (content) content.inert = false;
+        }, 8000);
+      }
+    </script>
+    <script src="intro.js" defer></script>
     <script>document.documentElement.classList.add("js");</script>
     <style>
       :root {
@@ -1026,6 +1039,16 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
   </head>
   <body>
+    <div id="intro-overlay" role="status" aria-label="A little warm-up. Your portfolio will appear in five seconds.">
+    <div class="intro-scene">
+      <div class="loader" aria-hidden="true"><div class="loader-fill"></div></div>
+      <video muted playsinline preload="auto" poster="assets/intro-treadmill-poster.jpg" aria-hidden="true" tabindex="-1">
+        <source src="assets/intro-treadmill.mp4" type="video/mp4">
+      </video>
+      <div class="intro-caption" aria-hidden="true"><span>A little warm-up…</span><span id="percentage">0%</span></div>
+    </div>
+    </div>
+    <div id="portfolio-content">
     <main>
       <div class="sidebar">
         <div class="sidebar__dots"></div>
@@ -1276,6 +1299,7 @@
       </nav>
     </footer>
 
+    </div>
     <script src="work-gallery.js" defer></script>
     <script>
       const toggle = document.querySelector(".mood-toggle");

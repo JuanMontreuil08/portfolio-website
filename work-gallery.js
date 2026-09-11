@@ -1,5 +1,5 @@
-// Galleries move only in response to direct user navigation.
-document.querySelectorAll('.work-gallery').forEach(element => {
+// Galleries advance automatically while the page is open.
+document.querySelectorAll('.work-gallery').forEach((element, galleryIndex) => {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const viewport = element.querySelector('.work-gallery__viewport');
   const count = viewport.children.length;
@@ -8,7 +8,15 @@ document.querySelectorAll('.work-gallery').forEach(element => {
   duplicate.inert = true;
   viewport.append(duplicate);
   let selected = 0;
+  let timer;
   let resizeFrame;
+
+  function schedule() {
+    const running = !reduced.matches && !document.hidden;
+    clearTimeout(timer);
+    timer = undefined;
+    if (running) timer = setTimeout(() => go(selected + 1), 2400 + galleryIndex * 500);
+  }
 
   function go(index, immediate = false) {
     const destination = Math.max(0, Math.min(count, index));
@@ -17,14 +25,9 @@ document.querySelectorAll('.work-gallery').forEach(element => {
       left: viewport.clientWidth * destination,
       behavior: immediate || reduced.matches ? 'instant' : 'smooth',
     });
+    schedule();
   }
 
-  viewport.addEventListener('keydown', event => {
-    const targets = { ArrowLeft: selected - 1, ArrowRight: selected + 1, Home: 0, End: count - 1 };
-    if (!(event.key in targets)) return;
-    event.preventDefault();
-    go(targets[event.key], true);
-  });
   let settling;
   function settled() {
     clearTimeout(settling);
@@ -32,8 +35,6 @@ document.querySelectorAll('.work-gallery').forEach(element => {
     const index = Math.round(viewport.scrollLeft / viewport.clientWidth);
     // The duplicate makes the wrap a forward slide, followed by an invisible reset.
     if (index === count) viewport.scrollTo({ left: 0, behavior: 'instant' });
-    // Track manual navigation within this gallery only.
-    if (index % count !== selected) go(index % count, true);
   }
   viewport.addEventListener('scroll', () => {
     clearTimeout(settling);
@@ -49,7 +50,9 @@ document.querySelectorAll('.work-gallery').forEach(element => {
   } else {
     window.addEventListener('resize', alignToViewport, { passive: true });
   }
+  document.addEventListener('visibilitychange', schedule);
   const handleMotionChange = () => go(selected, true);
   if ('addEventListener' in reduced) reduced.addEventListener('change', handleMotionChange);
   else reduced.addListener(handleMotionChange);
+  schedule();
 });

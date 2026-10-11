@@ -57,7 +57,6 @@
       <div class="section-heading"><h2 id="now-title">Now</h2></div>
       <div class="now-editorial">
         <header class="now-editorial__header">
-          <p class="now-editorial__eyebrow">JUAN MONTREUIL / 2026</p>
           <h3>Things that define me now</h3>
         </header>
 
@@ -97,7 +96,7 @@
               <p>AWS Nanodegree at Udacity</p>
             </div>
             <div class="now-editorial__learning-item">
-              <div class="now-editorial__learning-logos now-editorial__learning-logos--stanford"><span>Stanford Code in Place</span></div>
+              <div class="now-editorial__learning-logos"><img class="now-editorial__stanford-logo" src="assets/stanford-university-logo.jpg" width="3000" height="1687" alt="Stanford University logo" loading="lazy" decoding="async"></div>
               <p class="now-editorial__learning-title">Probability for AI</p>
               <p>Stanford Code in Place program</p>
             </div>
@@ -111,7 +110,19 @@
 
         <section class="now-editorial__lately now-editorial__chapter" aria-labelledby="now-lately-title">
           <div><h4 class="now-editorial__chapter-label" id="now-lately-title">05 / Life Lately</h4><p class="now-editorial__feature-title">San Francisco<br>Tech Week</p></div>
-          <div class="now-editorial__future-photo"><span>Photo + story to come</span></div>
+          <div class="life-marquee" role="region" aria-label="San Francisco Tech Week photo carousel">
+            <div class="life-marquee__viewport">
+              <div class="life-marquee__track">
+                <div class="life-marquee__group">
+                  <div class="life-marquee__card" aria-label="Photo slot 1"><span>SF / 01</span><strong>PEOPLE</strong></div>
+                  <div class="life-marquee__card" aria-label="Photo slot 2"><span>SF / 02</span><strong>PLACES</strong></div>
+                  <div class="life-marquee__card" aria-label="Photo slot 3"><span>SF / 03</span><strong>IDEAS</strong></div>
+                  <div class="life-marquee__card" aria-label="Photo slot 4"><span>SF / 04</span><strong>MOMENTS</strong></div>
+                </div>
+              </div>
+            </div>
+            <button class="life-marquee__toggle" type="button" aria-pressed="false" hidden>Pause carousel</button>
+          </div>
         </section>
       </div>
     </section>

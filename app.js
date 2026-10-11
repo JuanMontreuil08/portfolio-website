@@ -130,13 +130,7 @@
     duplicate.setAttribute('aria-hidden', 'true');
     lifeTrack.append(duplicate);
     lifeTrack.classList.add('is-ready');
-    lifeMarquee.querySelector('.life-marquee__toggle')?.removeAttribute('hidden');
   }
-  lifeMarquee?.querySelector('.life-marquee__toggle')?.addEventListener('click', (event) => {
-    const paused = lifeMarquee.classList.toggle('is-paused');
-    event.currentTarget.setAttribute('aria-pressed', String(paused));
-    event.currentTarget.textContent = paused ? 'Resume carousel' : 'Pause carousel';
-  });
 
   document.querySelector('#return-to-top')?.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'instant' : 'smooth' });

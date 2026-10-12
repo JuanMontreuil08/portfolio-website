@@ -1,4 +1,93 @@
 (() => {
+  const nav = document.querySelector('.hero__nav');
+  const navPill = nav?.querySelector('.hero__nav-pill');
+  const navLinks = [...(nav?.querySelectorAll('a[href^="#"]') ?? [])];
+  if (navPill && navLinks.length) {
+    const linkForHash = () => navLinks.find((link) => link.hash === window.location.hash) ?? navLinks[0];
+    let activeLink = linkForHash();
+    let previewLink = null;
+
+    function setActiveLink(link) {
+      activeLink = link;
+      navLinks.forEach((item) => {
+        if (item === link) item.setAttribute('aria-current', 'location');
+        else item.removeAttribute('aria-current');
+      });
+    }
+
+    function moveNavPill(link, instant = false) {
+      if (instant) navPill.style.transition = 'none';
+      navPill.style.width = `${link.offsetWidth}px`;
+      navPill.style.height = `${link.offsetHeight}px`;
+      navPill.style.transform = `translate3d(${link.offsetLeft}px, ${link.offsetTop}px, 0)`;
+      nav.classList.add('is-ready');
+      if (instant) requestAnimationFrame(() => { navPill.style.transition = ''; });
+    }
+
+    setActiveLink(activeLink);
+    moveNavPill(activeLink, true);
+    navLinks.forEach((link) => {
+      link.addEventListener('pointerenter', () => {
+        previewLink = link;
+        moveNavPill(link);
+      });
+      link.addEventListener('focus', () => {
+        previewLink = link;
+        moveNavPill(link);
+      });
+      link.addEventListener('click', () => {
+        setActiveLink(link);
+        moveNavPill(link);
+      });
+    });
+    nav.addEventListener('pointerleave', () => {
+      previewLink = null;
+      moveNavPill(activeLink);
+    });
+    nav.addEventListener('focusout', (event) => {
+      if (!nav.contains(event.relatedTarget)) {
+        previewLink = null;
+        moveNavPill(activeLink);
+      }
+    });
+    window.addEventListener('hashchange', () => {
+      setActiveLink(linkForHash());
+      if (!previewLink) moveNavPill(activeLink);
+    });
+    window.addEventListener('resize', () => moveNavPill(previewLink ?? activeLink, true), { passive: true });
+    document.fonts?.ready.then(() => moveNavPill(previewLink ?? activeLink, true));
+  }
+
+  const heroLines = [...document.querySelectorAll('.hero__type')];
+  if (heroLines.length) {
+    const copy = heroLines.map((line) => line.textContent);
+    const speeds = [145, 34, 18];
+    heroLines.forEach((line) => { line.textContent = ''; });
+    let lineIndex = 0;
+    let characterIndex = 0;
+
+    function typeNext() {
+      const line = heroLines[lineIndex];
+      line.classList.add('is-typing');
+      if (characterIndex < copy[lineIndex].length) {
+        line.textContent += copy[lineIndex][characterIndex];
+        characterIndex += 1;
+        window.setTimeout(typeNext, speeds[lineIndex]);
+      } else if (lineIndex < heroLines.length - 1) {
+        line.classList.remove('is-typing');
+        lineIndex += 1;
+        characterIndex = 0;
+        window.setTimeout(typeNext, 180);
+      } else {
+        line.classList.remove('is-typing');
+        line.classList.add('is-complete');
+      }
+    }
+
+    heroLines[0].classList.add('is-typing');
+    window.setTimeout(typeNext, 220);
+  }
+
   const timeline = document.querySelector('#timeline');
   const line = timeline?.querySelector('.timeline__line');
   const route = line?.querySelector('.timeline__route');
@@ -7,7 +96,7 @@
   const viewport = projects?.querySelector('.projects__viewport');
   const track = projects?.querySelector('.projects__track');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const narrowScreen = window.matchMedia('(max-width: 650px)');
+  const narrowScreen = window.matchMedia('(max-width: 900px)');
   const markers = items.map(() => {
     const marker = document.createElement('span');
     marker.className = 'timeline__marker';
@@ -121,6 +210,16 @@
       }
     });
   });
+
+  const projectVideos = [...document.querySelectorAll('.project__image video')];
+  function syncProjectVideos() {
+    projectVideos.forEach((video) => {
+      if (reducedMotion.matches) video.pause();
+      else video.play().catch(() => {});
+    });
+  }
+  reducedMotion.addEventListener('change', syncProjectVideos);
+  syncProjectVideos();
 
   const lifeMarquee = document.querySelector('.life-marquee');
   const lifeTrack = lifeMarquee?.querySelector('.life-marquee__track');

@@ -1,11 +1,19 @@
 (() => {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const clearSectionHash = () => {
+    if (window.location.hash) {
+      window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}`);
+    }
+  };
   const nav = document.querySelector('.hero__nav');
   const navPill = nav?.querySelector('.hero__nav-pill');
   const navLinks = [...(nav?.querySelectorAll('a[href^="#"]') ?? [])];
   if (navPill && navLinks.length) {
     const linkForHash = () => navLinks.find((link) => link.hash === window.location.hash) ?? navLinks[0];
+    const navSections = navLinks.map((link) => document.querySelector(link.hash));
     let activeLink = linkForHash();
     let previewLink = null;
+    let navFrame = 0;
 
     function setActiveLink(link) {
       activeLink = link;
@@ -24,6 +32,24 @@
       if (instant) requestAnimationFrame(() => { navPill.style.transition = ''; });
     }
 
+    function syncNavToScroll() {
+      navFrame = 0;
+      const cursor = window.innerHeight * .45;
+      let visibleLink = navLinks[0];
+      navSections.forEach((section, index) => {
+        if (section?.getBoundingClientRect().top <= cursor) visibleLink = navLinks[index];
+      });
+      if (visibleLink !== activeLink) {
+        previewLink = null;
+        setActiveLink(visibleLink);
+        moveNavPill(visibleLink);
+      }
+    }
+
+    function requestNavSync() {
+      if (!navFrame) navFrame = requestAnimationFrame(syncNavToScroll);
+    }
+
     setActiveLink(activeLink);
     moveNavPill(activeLink, true);
     navLinks.forEach((link) => {
@@ -35,9 +61,15 @@
         previewLink = link;
         moveNavPill(link);
       });
-      link.addEventListener('click', () => {
+      link.addEventListener('click', (event) => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const section = document.querySelector(link.hash);
+        if (!section) return;
+        event.preventDefault();
+        clearSectionHash();
         setActiveLink(link);
         moveNavPill(link);
+        section.scrollIntoView({ behavior: reducedMotion.matches ? 'instant' : 'smooth' });
       });
     });
     nav.addEventListener('pointerleave', () => {
@@ -54,8 +86,13 @@
       setActiveLink(linkForHash());
       if (!previewLink) moveNavPill(activeLink);
     });
-    window.addEventListener('resize', () => moveNavPill(previewLink ?? activeLink, true), { passive: true });
+    window.addEventListener('scroll', requestNavSync, { passive: true });
+    window.addEventListener('resize', () => {
+      requestNavSync();
+      moveNavPill(previewLink ?? activeLink, true);
+    }, { passive: true });
     document.fonts?.ready.then(() => moveNavPill(previewLink ?? activeLink, true));
+    requestNavSync();
   }
 
   const heroLines = [...document.querySelectorAll('.hero__type')];
@@ -95,7 +132,6 @@
   const projects = document.querySelector('#projects');
   const viewport = projects?.querySelector('.projects__viewport');
   const track = projects?.querySelector('.projects__track');
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const narrowScreen = window.matchMedia('(max-width: 900px)');
   const markers = items.map(() => {
     const marker = document.createElement('span');
@@ -232,6 +268,7 @@
   }
 
   document.querySelector('#return-to-top')?.addEventListener('click', () => {
+    clearSectionHash();
     window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'instant' : 'smooth' });
   });
 

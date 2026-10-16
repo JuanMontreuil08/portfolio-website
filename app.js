@@ -137,9 +137,9 @@
 
     function finish() {
       clearTimeout(timer);
-      caret?.classList.remove('is-caret', 'is-leading', 'is-paused');
+      caret?.classList.remove('is-leading');
+      caret?.classList.add('is-caret', 'is-paused');
       tracks.flat().forEach((character) => character.classList.add('is-visible'));
-
     }
     function typeNext() {
       caret?.classList.remove('is-caret', 'is-leading', 'is-paused');

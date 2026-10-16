@@ -22,7 +22,8 @@ for (const file of sourceFiles) {
   let contents = fs.readFileSync(source, 'utf8');
   if (file.endsWith('.html')) {
     for (const [original, versioned] of versionedFiles) {
-      contents = contents.replaceAll(`"${original}"`, `"${versioned}"`);
+      const escaped = original.replaceAll('.', '\\.');
+      contents = contents.replace(new RegExp(`"${escaped}(?:\\?v=[a-f0-9]+)?"`, 'g'), `"${versioned}"`);
     }
   }
   fs.writeFileSync(destination, contents);

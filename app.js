@@ -97,32 +97,69 @@
 
   const heroLines = [...document.querySelectorAll('.hero__type')];
   if (heroLines.length) {
-    const copy = heroLines.map((line) => line.textContent);
-    const speeds = [145, 34, 18];
-    heroLines.forEach((line) => { line.textContent = ''; });
+    // Lay out complete words first so revealing letters never changes wrapping.
+    const tracks = heroLines.map((line) => {
+      const copy = line.textContent;
+      const accessible = document.createElement('span');
+      accessible.className = 'hero__accessible-copy';
+      accessible.textContent = copy;
+      const visual = document.createElement('span');
+      visual.setAttribute('aria-hidden', 'true');
+      const characters = [];
+      for (const token of copy.match(/\S+|\s+/g) ?? []) {
+        if (/^\s+$/.test(token)) {
+          visual.append(document.createTextNode(token));
+          continue;
+        }
+        const word = document.createElement('span');
+        word.className = 'hero__word';
+        for (const letter of token) {
+          const character = document.createElement('span');
+          character.className = 'hero__character';
+          const ink = document.createElement('span');
+          ink.className = 'hero__ink';
+          ink.textContent = letter;
+          character.append(ink);
+          word.append(character);
+          characters.push(character);
+        }
+        visual.append(word);
+      }
+      line.replaceChildren(accessible, visual);
+      return characters;
+    });
+    const speeds = [150, 65, 42];
     let lineIndex = 0;
     let characterIndex = 0;
+    let timer = 0;
+    let caret = tracks[0][0];
+    caret.classList.add('is-caret', 'is-leading');
 
+    function finish() {
+      clearTimeout(timer);
+      caret?.classList.remove('is-caret', 'is-leading', 'is-paused');
+      tracks.flat().forEach((character) => character.classList.add('is-visible'));
+
+    }
     function typeNext() {
-      const line = heroLines[lineIndex];
-      line.classList.add('is-typing');
-      if (characterIndex < copy[lineIndex].length) {
-        line.textContent += copy[lineIndex][characterIndex];
-        characterIndex += 1;
-        window.setTimeout(typeNext, speeds[lineIndex]);
-      } else if (lineIndex < heroLines.length - 1) {
-        line.classList.remove('is-typing');
+      caret?.classList.remove('is-caret', 'is-leading', 'is-paused');
+      caret = tracks[lineIndex][characterIndex];
+      caret.classList.add('is-visible', 'is-caret');
+      characterIndex += 1;
+      const punctuation = /[,.!?]/.test(caret.textContent);
+      if (characterIndex < tracks[lineIndex].length) {
+        timer = window.setTimeout(typeNext, speeds[lineIndex] + (punctuation ? 160 : 0));
+      } else if (lineIndex < tracks.length - 1) {
         lineIndex += 1;
         characterIndex = 0;
-        window.setTimeout(typeNext, 180);
+        caret.classList.add('is-paused');
+        timer = window.setTimeout(typeNext, 320);
       } else {
-        line.classList.remove('is-typing');
-        line.classList.add('is-complete');
+        caret.classList.add('is-paused');
+        timer = window.setTimeout(finish, 700);
       }
     }
-
-    heroLines[0].classList.add('is-typing');
-    window.setTimeout(typeNext, 220);
+    timer = window.setTimeout(typeNext, 300);
   }
 
   const timeline = document.querySelector('#timeline');
@@ -140,67 +177,69 @@
     timeline.append(marker);
     return marker;
   });
-  const routeLength = route?.getTotalLength() ?? 0;
-  const viewBox = line?.viewBox.baseVal;
+  const tip = line?.querySelector('.timeline__tip');
   let markerProgress = [];
+  let lineTop = 0;
+  let lineHeight = 1;
+  let timelineProgress = 0;
+  let timelineTarget = 0;
+  let timelineFrame = 0;
+  let timelineTime = 0;
   let distance = 0;
   let travel = 0;
   let frame = 0;
   const clamp = (value) => Math.max(0, Math.min(1, value));
 
-  // The route travels downward through its bends, so its drawn length can be
-  // found at any vertical point with a short binary search.
-  function lengthAtY(y) {
-    if (!routeLength || !viewBox || y <= 0) return 0;
-    if (y >= viewBox.height) return routeLength;
-    let low = 0;
-    let high = routeLength;
-    for (let step = 0; step < 16; step += 1) {
-      const middle = (low + high) / 2;
-      if (route.getPointAtLength(middle).y < y) low = middle;
-      else high = middle;
-    }
-    return (low + high) / 2;
-  }
-
   function measureTimeline() {
-    if (!timeline || !line || !routeLength || !viewBox) return;
+    if (!timeline || !line || !route) return;
     const timelineRect = timeline.getBoundingClientRect();
     const lineRect = line.getBoundingClientRect();
-    markerProgress = items.map((item, index) => {
-      const itemRect = item.getBoundingClientRect();
-      const verticalPoint = clamp((itemRect.top + itemRect.height / 2 - lineRect.top) / lineRect.height) * viewBox.height;
-      const length = lengthAtY(verticalPoint);
-      const point = route.getPointAtLength(length);
-      markers[index].style.left = `${lineRect.left - timelineRect.left + point.x / viewBox.width * lineRect.width}px`;
-      markers[index].style.top = `${lineRect.top - timelineRect.top + point.y / viewBox.height * lineRect.height}px`;
-      return length / routeLength;
+    lineTop = lineRect.top + window.scrollY;
+    lineHeight = Math.max(1, lineRect.height);
+    // Read geometry together, then position the decorative milestones.
+    const centers = items.map((item) => {
+      const rect = item.getBoundingClientRect();
+      return rect.top + rect.height / 2;
     });
+    markerProgress = centers.map((center) => clamp((center - lineRect.top) / lineHeight));
+    markers.forEach((marker, index) => {
+      marker.style.left = `${lineRect.left + lineRect.width / 2 - timelineRect.left - timeline.clientLeft}px`;
+      marker.style.top = `${centers[index] - timelineRect.top - timeline.clientTop}px`;
+    });
+    paintTimeline();
+  }
+
+  function paintTimeline() {
+    if (!route || !tip) return;
+    route.style.transform = `scaleY(${timelineProgress})`;
+    tip.style.transform = `translateY(${timelineProgress * lineHeight}px)`;
+    tip.style.opacity = timelineProgress > 0 && timelineProgress < 1 ? '1' : '0';
+    markerProgress.forEach((milestone, index) => {
+      const lit = timelineProgress >= milestone;
+      items[index].classList.toggle('is-lit', lit);
+      markers[index].classList.toggle('is-lit', lit);
+    });
+  }
+
+  function animateTimeline(now) {
+    timelineFrame = 0;
+    const elapsed = timelineTime ? Math.min(now - timelineTime, 64) : 1000 / 60;
+    timelineTime = now;
+    // Equivalent to a 12% catch-up per frame at 60 Hz, consistent at 120 Hz too.
+    const follow = 1 - Math.pow(1 - .12, elapsed / (1000 / 60));
+    timelineProgress += (timelineTarget - timelineProgress) * follow;
+    const settled = Math.abs(timelineTarget - timelineProgress) * lineHeight < .1;
+    if (settled) timelineProgress = timelineTarget;
+    paintTimeline();
+    if (!settled) timelineFrame = requestAnimationFrame(animateTimeline);
+    else timelineTime = 0;
   }
 
   function updateTimeline() {
-    if (!timeline || !line || !routeLength || !viewBox) return;
-    if (reducedMotion.matches) {
-      route.style.strokeDashoffset = '0';
-      items.forEach((item, index) => {
-        item.classList.add('is-lit');
-        markers[index].classList.add('is-lit');
-        markers[index].classList.remove('is-current');
-      });
-      return;
-    }
-    const lineRect = line.getBoundingClientRect();
-    const cursor = (window.innerHeight * .55 - lineRect.top) / lineRect.height * viewBox.height;
-    const progress = lengthAtY(cursor) / routeLength;
-    route.style.strokeDashoffset = String(1 - progress);
-    let current = -1;
-    markerProgress.forEach((milestone, index) => {
-      const lit = progress >= milestone - .0005;
-      items[index].classList.toggle('is-lit', lit);
-      markers[index].classList.toggle('is-lit', lit);
-      if (lit) current = index;
-    });
-    markers.forEach((marker, index) => marker.classList.toggle('is-current', index === current));
+    if (!line || !route) return;
+    // Keep the reading point in the viewport; touch and keyboard scrolling work too.
+    timelineTarget = clamp((window.scrollY + window.innerHeight * .55 - lineTop) / lineHeight);
+    if (!timelineFrame) timelineFrame = requestAnimationFrame(animateTimeline);
   }
 
   function measure() {

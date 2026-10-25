@@ -95,6 +95,139 @@
     requestNavSync();
   }
 
+  // A scripted Claude Code session: reserve its final layout before revealing anything.
+  function createHeroTerminal() {
+    const stage = document.querySelector('.hero-terminal');
+    if (!stage) return { start() {}, finish() {} };
+    const terminal = stage.querySelector('.terminal');
+    const dock = stage.querySelector('.hero-terminal__dock');
+    const launcher = stage.querySelector('.hero-terminal__launcher');
+    const log = stage.querySelector('.terminal__log');
+    const glyph = stage.querySelector('.terminal__glyph');
+    const meta = stage.querySelector('.terminal__meta');
+    const frames = ['·', '✢', '✳', '✶', '✻', '✽', '✻', '✶', '✳', '✢'];
+    let state = 'waiting';
+    let timer = 0;
+    let ticker = 0;
+    let frame = 0;
+    let tokens = 0;
+    let startedAt = 0;
+    const setState = (next) => { state = stage.dataset.state = next; };
+    const prepare = (element, byWord) => {
+      const copy = element.textContent;
+      const accessible = document.createElement('span');
+      accessible.className = 'hero__accessible-copy';
+      accessible.textContent = copy;
+      const visual = document.createElement('span');
+      visual.setAttribute('aria-hidden', 'true');
+      const pieces = (byWord ? copy.match(/\S+\s*/g) : [...copy]) ?? [];
+      const spans = pieces.map((piece) => {
+        const span = document.createElement('span');
+        span.className = 'terminal__token';
+        span.textContent = piece;
+        visual.append(span);
+        return span;
+      });
+      element.replaceChildren(accessible, visual);
+      return spans;
+    };
+    const draftTokens = prepare(stage.querySelector('.terminal__draft'), false);
+    const answerTokens = [...stage.querySelectorAll('.terminal__answer p')].flatMap(p => prepare(p, true));
+    const later = (callback, delay) => { timer = window.setTimeout(callback, delay); };
+    const between = (min, max) => min + Math.random() * (max - min);
+    const endsSentence = token => /[.!?:]["”]?\s*$/.test(token.textContent);
+    const endsParagraph = token => token === token.parentElement.lastElementChild;
+    const formatTokens = count => (count < 1000 ? String(count) : `${(count / 1000).toFixed(1)}k`);
+    // Keep the newest line in view, the way a terminal follows its output.
+    const follow = (element) => {
+      const overflow = element.getBoundingClientRect().bottom + 4 - log.getBoundingClientRect().bottom;
+      if (overflow > 0) log.scrollTop += Math.ceil(overflow);
+    };
+    log.addEventListener('scroll', () => log.classList.toggle('is-clipped', log.scrollTop > 0));
+    setState(state);
+    terminal.inert = true;
+
+    function tick() {
+      glyph.textContent = frames[frame++ % frames.length];
+      if (state === 'thinking') tokens += Math.round(between(18, 46));
+      const seconds = Math.floor((performance.now() - startedAt) / 1000);
+      meta.textContent = `(${seconds}s · ↓ ${formatTokens(tokens)} tokens · esc to interrupt)`;
+    }
+
+    function finish() {
+      if (state === 'done') return;
+      clearTimeout(timer);
+      clearInterval(ticker);
+      const moveFocus = document.activeElement === launcher;
+      setState('done');
+      dock.hidden = true;
+      terminal.inert = false;
+      draftTokens.forEach(token => token.classList.remove('is-visible'));
+      answerTokens.forEach(token => token.classList.add('is-visible'));
+      log.scrollTop = log.scrollHeight;
+      if (moveFocus) terminal.focus({ preventScroll: true });
+    }
+
+    // Arrive in uneven chunks, the way a model's tokens do.
+    function streamAnswer(index = 0) {
+      setState('streaming');
+      const size = 1 + Math.floor(Math.random() * 4);
+      let end = index;
+      while (end < answerTokens.length && end - index < size) {
+        end += 1;
+        if (endsSentence(answerTokens[end - 1])) break;
+      }
+      answerTokens.slice(index, end).forEach(token => token.classList.add('is-visible'));
+      follow(answerTokens[end - 1]);
+      tokens +=Math.round((end - index) * 1.4);
+      if (end === answerTokens.length) {
+        later(finish, 450);
+        return;
+      }
+      const last = answerTokens[end - 1];
+      later(() => streamAnswer(end), endsParagraph(last) ? 420 : endsSentence(last) ? 170 : between(35, 90));
+    }
+
+    function submit() {
+      draftTokens.forEach(token => token.classList.remove('is-visible'));
+      setState('thinking');
+      follow(stage.querySelector('.terminal__prompt'));
+      startedAt = performance.now();
+      tick();
+      ticker = window.setInterval(tick, 120);
+      later(streamAnswer, 3600);
+    }
+
+    function typeDraft(index = 0) {
+      setState('typing');
+      draftTokens[index].classList.add('is-visible');
+      if (index + 1 < draftTokens.length) later(() => typeDraft(index + 1), between(45, 115));
+      else later(submit, 550);
+    }
+
+    function open() {
+      if (state !== 'notifying') return;
+      const moveFocus = document.activeElement === launcher;
+      setState('opening');
+      terminal.inert = false;
+      if (moveFocus) terminal.focus({ preventScroll: true });
+      later(() => {
+        dock.hidden = true;
+        typeDraft();
+      }, 450);
+    }
+
+    launcher.addEventListener('click', open);
+    return {
+      finish,
+      start() {
+        if (state !== 'waiting') return;
+        setState('notifying');
+        dock.hidden = false;
+      }
+    };
+  }
+  const heroTerminal = createHeroTerminal();
   const heroLines = [...document.querySelectorAll('.hero__type')];
   if (heroLines.length) {
     // Lay out complete words first so revealing letters never changes wrapping.
@@ -137,9 +270,9 @@
 
     function finish() {
       clearTimeout(timer);
-      caret?.classList.remove('is-leading');
-      caret?.classList.add('is-caret', 'is-paused');
+      caret?.classList.remove('is-leading', 'is-caret', 'is-paused');
       tracks.flat().forEach((character) => character.classList.add('is-visible'));
+      heroTerminal.start();
     }
     function typeNext() {
       caret?.classList.remove('is-caret', 'is-leading', 'is-paused');
@@ -160,7 +293,7 @@
       }
     }
     timer = window.setTimeout(typeNext, 300);
-  }
+  } else heroTerminal.start();
 
   const timeline = document.querySelector('#timeline');
   const line = timeline?.querySelector('.timeline__line');
@@ -225,8 +358,8 @@
     timelineFrame = 0;
     const elapsed = timelineTime ? Math.min(now - timelineTime, 64) : 1000 / 60;
     timelineTime = now;
-    // Equivalent to a 12% catch-up per frame at 60 Hz, consistent at 120 Hz too.
-    const follow = 1 - Math.pow(1 - .12, elapsed / (1000 / 60));
+    // Reach about 95% of the scroll target in 140 ms at any refresh rate.
+    const follow = 1 - Math.pow(1 - .30, elapsed / (1000 / 60));
     timelineProgress += (timelineTarget - timelineProgress) * follow;
     const settled = Math.abs(timelineTarget - timelineProgress) * lineHeight < .1;
     if (settled) timelineProgress = timelineTarget;
@@ -239,6 +372,14 @@
     if (!line || !route) return;
     // Keep the reading point in the viewport; touch and keyboard scrolling work too.
     timelineTarget = clamp((window.scrollY + window.innerHeight * .55 - lineTop) / lineHeight);
+    if (reducedMotion.matches) {
+      if (timelineFrame) cancelAnimationFrame(timelineFrame);
+      timelineFrame = 0;
+      timelineTime = 0;
+      timelineProgress = timelineTarget;
+      paintTimeline();
+      return;
+    }
     if (!timelineFrame) timelineFrame = requestAnimationFrame(animateTimeline);
   }
 

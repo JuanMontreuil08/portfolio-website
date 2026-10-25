@@ -8,12 +8,6 @@
 @media(max-width:900px){.hero{grid-template-columns:55% 45%}.hero__first{font-size:clamp(5rem,12vw,8rem)}.hero__last{font-size:clamp(3.4rem,7.4vw,6rem)}.hero__middle{display:block}.hero__nav{margin-bottom:40px}.timeline{padding:24px}.timeline-item{grid-template-columns:minmax(0,1fr) 160px minmax(0,1fr);min-height:370px}.timeline__line{width:160px;left:calc(50% - 80px)}.timeline-item__photo{width:170px}.projects__sticky{grid-template-columns:32% 68%}.projects__intro>p{font-size:16px}}
 @media(max-width:650px){.section-pad{padding:68px 18px}.section-heading{display:block;margin-bottom:30px}.section-heading p{margin-top:14px;font-size:14px}.hero{display:flex;flex-direction:column;min-height:0}.hero__content{min-height:530px;padding:22px}.hero__first{font-size:clamp(5.2rem,22vw,9rem)}.hero__last{font-size:clamp(2.95rem,13vw,5.5rem)}.hero__middle{padding:28px 0}.hero__nav{display:grid;grid-template-columns:repeat(3,max-content);gap:10px 20px;margin-bottom:30px;font-size:13px}.hero__intro{font-size:16px;max-width:330px}.hero__portrait{height:470px}.hero__portrait img{object-position:center 44%}.timeline{padding:20px 16px 28px;border-radius:20px}.timeline__line{width:72px;left:8px;top:25px;height:calc(100% - 50px)}.timeline-item{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:450px;gap:20px;padding-left:84px}.timeline-item__copy{padding:0;max-width:100%;order:2}.timeline-item__photo{order:1;margin:0;width:160px}.timeline-item:nth-of-type(even) .timeline-item__copy,.timeline-item:nth-of-type(even) .timeline-item__photo{grid-column:auto;grid-row:auto}.timeline-item__date{font-size:26px}.timeline-item ul{font-size:14px}.projects{height:auto!important}.projects__sticky{height:auto;position:static;display:block;padding:70px 18px}.projects__intro{display:block;padding:0}.projects__intro h2{margin:0 0 28px}.projects__intro>p{max-width:420px}.projects__viewport{height:auto;overflow:visible}.projects__track{display:grid;gap:90px;width:100%;padding:0;transform:none!important}.project{width:100%;transform:none}.project--first .project__image{width:76%}.project__image{height:clamp(330px,90vw,500px)}.project--second{width:90%;margin-left:auto}.project__overlay{padding:24px}.project__overlay>span:not(.project__number){font-size:14px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.project__image>:is(img,video),.project__overlay{transition:none}.projects__track{transform:none!important;will-change:auto}.projects{height:auto!important}.projects__sticky{position:static;height:auto;display:block}.projects__intro{display:block;padding:0;margin-bottom:40px}.projects__viewport{height:auto;overflow:visible}.projects__track{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:35px;width:100%;padding:0}.project,.project--first,.project--second{width:100%;transform:none}.project--first .project__image{width:100%}}
-.timeline-item__detail{margin-top:16px;border-top:1px solid #bfc0bd;padding-top:10px;font-size:13px;line-height:1.5}
-.timeline-item__detail summary{width:max-content;max-width:100%;cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:3px}
-.timeline-item__detail summary:hover{color:#164ae7}
-.timeline-item__detail summary:focus-visible{outline:2px solid #164ae7;outline-offset:4px}
-.timeline-item__detail p{margin:10px 0 0;color:#444}
-.timeline-item__detail p+p{margin-top:18px}
 .timeline-item__date{margin-bottom:18px}
 .project{width:min(clamp(390px,39vw,570px),calc(100svh - clamp(56px,10vw,176px) - 42px))}
 .project--first,.project--third{width:min(400px,calc(56.25svh - 118px))}
@@ -40,13 +34,14 @@
 .timeline__route-dots{background:repeating-linear-gradient(to bottom,var(--route-dots) 0 2px,transparent 2px 7px)}
 .timeline__route{background:var(--blue);transform:scaleY(0);transform-origin:top;box-shadow:0 0 4px #2c6fff33,0 0 12px #2c6fff26}
 .timeline__tip{position:absolute;top:-2.5px;left:-1.5px;width:5px;height:5px;border-radius:50%;background:var(--blue);box-shadow:0 0 5px 1px #2c6fff55,0 0 12px 3px #2c6fff33;opacity:0;pointer-events:none}
-.timeline__marker{position:absolute;z-index:2;width:15px;height:15px;border:1px solid var(--route-dots);border-radius:50%;background:#e8e9e6;transform:translate(-50%,-50%);pointer-events:none;transition:border-color 300ms cubic-bezier(.215,.61,.355,1)}
-.timeline__marker::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--route-dots);transition:background-color 300ms cubic-bezier(.215,.61,.355,1)}
+.timeline__marker{position:absolute;z-index:2;width:15px;height:15px;border:1px solid var(--route-dots);border-radius:50%;background:#e8e9e6;transform:translate(-50%,-50%);pointer-events:none;transition:border-color 140ms cubic-bezier(.215,.61,.355,1)}
+.timeline__marker::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--route-dots);transition:background-color 140ms cubic-bezier(.215,.61,.355,1)}
 .timeline__marker::before{content:"";position:absolute;inset:-1px;border:1px solid var(--blue);border-radius:50%;opacity:0;pointer-events:none}
 .timeline__marker.is-lit{border-color:var(--blue)}
 .timeline__marker.is-lit::after{background:var(--blue)}
 .timeline__marker.is-lit::before{animation:milestone-burst 720ms cubic-bezier(.215,.61,.355,1) both}
 @keyframes milestone-burst{0%{opacity:.75;transform:scale(1)}100%{opacity:0;transform:scale(3.6)}}
+@media(prefers-reduced-motion:reduce){.timeline__marker,.timeline__marker::after{transition:none}.timeline__marker.is-lit::before{animation:none}}
 @media(max-width:650px){.timeline__line{width:2px;left:43px}}
 .timeline-item.is-lit li::marker{color:var(--blue)}
 
@@ -148,3 +143,70 @@ body:has(main :focus-visible) .footer-veil{visibility:hidden}
 @media(prefers-reduced-motion:reduce){
   .hero__nav-pill,.hero__nav a{transition:none}
 }
+
+/* Reserve the full session from the start so nothing shifts the page. */
+.hero__message{position:relative;justify-content:flex-start;padding:20px 0 0}
+.hero-terminal{position:relative;width:100%;max-width:680px;margin-top:20px}
+.terminal{display:flex;flex-direction:column;border:1px solid #d9d8d2;border-radius:12px;background:#f6f5f1;overflow:hidden;box-shadow:0 5px 16px #24231e07;font:400 12px/1.5 'IBM Plex Mono',monospace;letter-spacing:-.025em;transform-origin:35px 39px;transition:opacity 220ms ease-out,transform 420ms cubic-bezier(.16,1,.3,1),visibility 0s}
+.terminal__titlebar{flex-shrink:0;display:flex;align-items:center;gap:12px;min-height:30px;padding:0 14px;border-bottom:1px solid #e0dfd9;background:#eeede8;color:#77756d;font-size:10px;letter-spacing:0}
+.terminal__title{flex:1;text-align:center;padding-right:40px}
+.terminal__lights{display:flex;gap:5px;width:40px}
+.terminal__lights i{width:7px;height:7px;border-radius:50%;background:#c9c7bf}
+.terminal__lights i:first-child{background:#d68b7d}.terminal__lights i:nth-child(2){background:#d7bd7b}.terminal__lights i:last-child{background:#9bb599}
+.terminal__body{padding:14px 16px 10px}
+/* Full size wherever it fits; on short screens the transcript scrolls once the answer is done. */
+.terminal{max-height:calc(100svh - 32px)}
+.terminal__body{display:flex;flex-direction:column;flex:0 1 auto;min-height:0}
+.terminal__body>:not(.terminal__log){flex-shrink:0}
+.terminal__log{flex:0 1 auto;min-height:72px;margin-inline:-9px;padding-inline:9px;overflow:hidden;scrollbar-width:thin;scrollbar-color:#cfccc3 transparent;scrollbar-gutter:stable}
+.terminal__log.is-clipped{-webkit-mask-image:linear-gradient(transparent,#000 32px);mask-image:linear-gradient(transparent,#000 32px)}
+.hero-terminal[data-state="done"] .terminal__log{overflow-y:auto}
+.terminal__welcome{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.terminal__mascot{display:block;width:44px;height:44px;flex-shrink:0}
+.terminal__welcome p{color:#77756d;line-height:1.45}
+.terminal__welcome strong{font-weight:600;color:var(--ink)}
+.terminal__prompt{padding:7px 9px;margin-inline:-9px;background:#e9e8e2;border-radius:3px;line-height:1.5;transition:opacity 120ms ease-out}
+.terminal__prompt>span:first-child,.terminal__input>span:first-child{color:#827d72;margin-right:6px}
+.terminal__output{position:relative;margin:12px 0 0;padding-left:15px}
+.terminal__output::before{content:'●';position:absolute;top:0;left:0;font-size:9px;line-height:2.1}
+.terminal__answer p+p{margin-top:12px}
+.terminal__status{margin-top:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.terminal__glyph{display:inline-block;width:1ch;margin-right:4px;color:#d97757;text-align:center}
+.terminal__verb{background:linear-gradient(90deg,#d97757 38%,#f6cbb7 50%,#d97757 62%) 0 0/300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:terminal-shimmer 1800ms linear infinite}
+.terminal__meta{color:#8c887f}
+.terminal__input{display:flex;align-items:center;margin-top:8px;padding:7px 0;border-block:1px solid #dedbd3}
+.terminal__draft{white-space:pre}
+.terminal__caret{display:inline-block;width:.62em;height:1.3em;background:#3a3934}
+.terminal__hints{margin-top:6px;color:#8c887f;font-size:10.5px}
+.hero-terminal[data-state] .terminal__token{opacity:0;transition:opacity 120ms ease-out}
+.hero-terminal[data-state] .terminal__token.is-visible{opacity:1}
+.terminal__input .terminal__token:not(.is-visible){display:none}
+.hero-terminal:is([data-state="waiting"],[data-state="notifying"]) .terminal{visibility:hidden;opacity:0;transform:scale(.06)}
+.hero-terminal:is([data-state="waiting"],[data-state="notifying"],[data-state="opening"],[data-state="typing"]) .terminal__prompt{opacity:0}
+.hero-terminal:not([data-state="streaming"],[data-state="done"]) .terminal__output::before{opacity:0}
+.hero-terminal:not([data-state="thinking"],[data-state="streaming"]) .terminal__status{visibility:hidden}
+.hero-terminal:not([data-state="typing"]) .terminal__caret{animation:terminal-caret 1060ms steps(1) infinite}
+
+/* A floating Terminal icon, like a Dock app with a new notification. */
+.hero-terminal__dock{position:absolute;z-index:1;top:8px;left:4px;display:flex;align-items:flex-start;gap:4px;transition:opacity 200ms ease-out,transform 200ms ease-out}
+.hero-terminal[data-state="opening"] .hero-terminal__dock{opacity:0;transform:scale(.9);pointer-events:none}
+.hero-terminal__launcher{position:relative;padding:0;border:0;border-radius:15px;background:none;cursor:pointer;animation:terminal-notification 1400ms ease-out,terminal-float 3200ms ease-in-out 1400ms infinite}
+.hero-terminal__icon{display:flex;width:62px;height:62px;padding:8px 9px;border:3px solid #c9cdca;border-radius:15px;background:linear-gradient(160deg,#3b403d,#121513 62%);box-shadow:inset 0 0 0 1.5px #090b0a,0 8px 14px #181e1824;color:#f4f4f2;transition:transform 160ms ease-out}
+.hero-terminal__launcher:hover .hero-terminal__icon{transform:scale(1.06)}
+.hero-terminal__icon>span{font:600 16px/1 'IBM Plex Mono',monospace;letter-spacing:-1px}
+.hero-terminal__badge{position:absolute;top:-7px;right:-7px;display:grid;place-items:center;width:23px;height:23px;border:2px solid var(--paper);border-radius:50%;background:#d9433f;color:#fff;font:600 12px/1 Inter,sans-serif}
+.hero-terminal__hint{display:flex;align-items:flex-end;margin-top:24px;color:var(--ink);pointer-events:none;opacity:0;animation:terminal-hint-in 400ms ease-out 1000ms forwards,terminal-nudge 1600ms ease-in-out 2400ms infinite}
+.hero-terminal__arrow{flex-shrink:0;width:46px;height:30px;overflow:visible}
+.hero-terminal__arrow path{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:terminal-draw 500ms ease-out 1100ms forwards}
+.hero-terminal__arrow path+path{animation-delay:1550ms;animation-duration:200ms}
+.hero-terminal__hint>span{margin-left:2px;font:600 27px/1 Caveat,cursive;letter-spacing:0;white-space:nowrap;transform:rotate(-7deg) translateY(12px)}
+.hero-terminal [hidden]{display:none}
+@keyframes terminal-notification{0%,42%,50%,92%,100%{transform:translateY(0)}20%{transform:translateY(-17px)}70%{transform:translateY(-12px)}}
+@keyframes terminal-float{50%{transform:translateY(-7px)}}
+@keyframes terminal-hint-in{to{opacity:1}}
+@keyframes terminal-draw{to{stroke-dashoffset:0}}
+@keyframes terminal-nudge{50%{transform:translateX(-5px)}}
+@keyframes terminal-shimmer{from{background-position:100% 0}to{background-position:0 0}}
+@keyframes terminal-caret{50%{opacity:0}}
+@media(max-width:650px){.terminal__body{padding:14px}.terminal{font-size:11.5px;line-height:1.5}.terminal__titlebar{padding-inline:11px;gap:6px}}
+@media(min-width:651px){.hero__portrait img{position:absolute;inset:0}}

@@ -69,7 +69,8 @@
         clearSectionHash();
         setActiveLink(link);
         moveNavPill(link);
-        section.scrollIntoView({ behavior: reducedMotion.matches ? 'instant' : 'smooth' });
+        const jumpDirectly = reducedMotion.matches || ['#experience', '#projects', '#now'].includes(link.hash);
+        section.scrollIntoView({ behavior: jumpDirectly ? 'instant' : 'smooth' });
       });
     });
     nav.addEventListener('pointerleave', () => {
@@ -414,14 +415,8 @@
   }
 
   document.querySelectorAll('.project__image').forEach((button) => {
-    button.addEventListener('click', () => {
-      const active = button.classList.toggle('is-active');
-      button.setAttribute('aria-pressed', String(active));
-    });
     button.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
-        button.classList.remove('is-active');
-        button.setAttribute('aria-pressed', 'false');
         button.blur();
       }
     });
